@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>해양 날씨 및 낚시 전문가 보고서</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        }
+        .accordion-content.active {
+            max-height: 10000px; /* Arbitrarily large value to allow content to expand */
+            padding-top: 1.5rem; /* pt-6 */
+            padding-bottom: 1.5rem; /* pb-6 */
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primaryBlue: 'hsl(210, 80%, 30%)',
+                        secondaryBlue: 'hsl(210, 70%, 50%)',
+                        lightBlue: 'hsl(210, 20%, 95%)',
+                        darkText: 'hsl(220, 10%, 20%)',
+                        lightText: 'hsl(210, 10%, 85%)',
+                        accentGreen: 'hsl(160, 50%, 45%)',
+                        accentOrange: 'hsl(30, 80%, 55%)',
+                        dangerRed: 'hsl(10, 70%, 55%)',
+                        warningYellow: 'hsl(45, 90%, 60%)',
+                        bgGradientStart: 'hsl(210, 30%, 15%)',
+                        bgGradientEnd: 'hsl(220, 25%, 10%)',
+                    },
+                    fontFamily: {
+                        display: ['"Noto Sans KR"', 'sans-serif'],
+                        body: ['Outfit', '"Noto Sans KR"', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'gradient-radial-blue': 'radial-gradient(ellipse at center, var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-bgGradientEnd text-lightText font-body antialiased relative min-h-screen">
+    <!-- Gradient Overlay for Premium Look -->
+    <div class="absolute inset-0 bg-gradient-radial-blue from-bgGradientStart to-bgGradientEnd opacity-70"></div>
+
+    <div class="relative z-10 p-4 md:p-8 max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="text-center py-8 md:py-12 mb-8 bg-gradient-to-br from-primaryBlue to-secondaryBlue rounded-xl shadow-2xl transform hover:scale-[1.005] transition-transform duration-300">
+            <h1 class="text-3xl md:text-5xl font-display font-bold text-white leading-tight animate-fade-in">
+                해양 날씨 및 낚시 전문가 보고서
+            </h1>
+            <p class="mt-2 md:mt-4 text-xl md:text-2xl font-body font-light text-lightBlue animate-fade-in delay-100">
+                정확한 해양 정보로 안전한 조업 및 낚시를 지원합니다.
+            </p>
+        </header>
+
+        <main>
+            <!-- Expert Analysis Report Section -->
+            <section class="mb-12 md:mb-16">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-8 text-center animate-fade-in delay-200">
+                    전문가 분석 보고서 <span class="text-secondaryBlue">|</span> 1월 24-30일
+                </h2>
+
+                <div class="space-y-6 md:space-y-8">
+                    <!-- Report Accordion Items -->
+                    <!-- 서해중부 (West Sea Central) -->
+                    <div class="bg-lightBlue bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primaryBlue/30 hover:shadow-2xl hover:border-secondaryBlue/50 transition-all duration-300 cursor-pointer group animate-fade-in delay-300" onclick="toggleAccordion(this)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl md:text-2xl font-display font-semibold text-white group-hover:text-accentGreen">
+                                서해중부 (West Sea Central)
+                            </h3>
+                            <span class="text-white text-2xl group-hover:text-accentGreen transition-transform duration-300 transform group-[.active]:rotate-180">+</span>
+                        </div>
+                        <div class="accordion-content text-darkText mt-0 overflow-hidden text-lg">
+                            <div class="bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                                <p class="text-gray-700 leading-relaxed mb-4">
+                                    <strong class="text-primaryBlue">지역 개요:</strong> 비교적 얕은 수심, 큰 조수간만 차, 혼합된 지형 (암초 해안, 모래, 갯벌). 예보: 대체로 흐리거나 맑음, 파고 0.5m ~ 2.5m. 1월 26일 (월) 파고 0.5m-1.5m로 낮아질 예정.
+                                </p>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">날씨 영향 분석</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">파고:</strong> 대체로 0.5m-2m로 안정적이나, 1월 24일(토) 오후 2.5m로 약간 높아질 수 있습니다. 1월 26일(월)이 가장 잔잔하여 소형 선박 및 갯바위 낚시에 유리합니다.</li>
+                                    <li><strong class="text-primaryBlue">강수량:</strong> 한 주 내내 비 예보 없음, 쾌적한 낚시 여건.</li>
+                                    <li><strong class="text-primaryBlue">시정:</strong> 맑거나 흐린 날씨로 대체로 좋으나, 1월 27일(화) 흐린 날 주의.</li>
+                                    <li><strong class="text-primaryBlue">기온/바람:</strong> 낮은 수온과 체감 추위 예상. 낮은 수온은 어류 활동을 감소시키므로 특정 포인트 집중 공략 필요.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">추천 어종 및 전략</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">대상 어종:</strong> 우럭, 광어, 노래미.</li>
+                                    <li><strong class="text-primaryBlue">낚시 전략:</strong>
+                                        <ul class="list-circle list-inside ml-4">
+                                            <li><strong class="text-primaryBlue">선상/갯바위 루어 낚시:</strong> 잔잔한 날(1월 26일)에 유리. 지그헤드와 웜 또는 메탈 지그를 이용한 바닥 공략 효과적.</li>
+                                            <li><strong class="text-primaryBlue">원투 낚시:</strong> 모래/뻘 지형의 광어나 가자미류 대상, 지렁이나 새우 미끼 사용.</li>
+                                            <li><strong class="text-primaryBlue">집중 공략:</strong> 저수온기 어군 분산 가능성 있어 한 포인트에 대한 끈기 있는 공략이 중요.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">해상 안전 수칙</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">선박 운항:</strong> 1월 24일 오후 파고 2.5m는 소형 선박에 부담. 출항 전 날씨 변화 확인 및 무리한 조업 자제.</li>
+                                    <li><strong class="text-primaryBlue">갯바위 낚시:</strong> 1월 24일 오후 너울성 파도에 주의. 구명조끼 착용 및 미끄럼 방지 신발 필수.</li>
+                                    <li><strong class="text-primaryBlue">저체온증 예방:</strong> 방수 및 방풍 의류 착용, 따뜻한 음료 및 여벌 옷 준비.</li>
+                                    <li><strong class="text-primaryBlue">지속적인 날씨 확인:</strong> 기상 예보는 변동될 수 있으므로 최신 정보 지속 확인.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">전문가 의견 및 요약</h4>
+                                <p class="text-gray-700 leading-relaxed mb-2">
+                                    1월 24일 오후를 제외하고는 대체로 양호한 조황이 기대됩니다. 1월 26일(월)은 소형 선박 출조 및 갯바위 낚시에 최적의 날입니다. 저수온 대비 철저한 준비가 필요합니다.
+                                </p>
+                                <p class="text-gray-700 leading-relaxed mb-2"><strong class="text-primaryBlue">전문가 종합 평가:</strong> <span class="text-accentGreen font-semibold">보통 ~ 좋음</span></p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">최적의 날:</strong> 1월 26일 (월) 오전/오후</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 서해남부 (West Sea Southern) -->
+                    <div class="bg-lightBlue bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primaryBlue/30 hover:shadow-2xl hover:border-secondaryBlue/50 transition-all duration-300 cursor-pointer group animate-fade-in delay-300" onclick="toggleAccordion(this)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl md:text-2xl font-display font-semibold text-white group-hover:text-accentGreen">
+                                서해남부 (West Sea Southern)
+                            </h3>
+                            <span class="text-white text-2xl group-hover:text-accentGreen transition-transform duration-300 transform group-[.active]:rotate-180">+</span>
+                        </div>
+                        <div class="accordion-content text-darkText mt-0 overflow-hidden text-lg">
+                            <div class="bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                                <p class="text-gray-700 leading-relaxed mb-4">
+                                    <strong class="text-primaryBlue">지역 개요:</strong> 복잡한 해안선과 다수의 섬이 다양한 어종 서식에 기여. 주말 예보: 흐리고 눈, 이후 대체로 흐림, 파고 1m ~ 3m.
+                                </p>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">날씨 영향 분석</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">파고:</strong> 1월 24일(토) 눈과 함께 1m-3m의 높은 파고. 1월 27일(화) - 28일(수)에도 다시 1m-3m로 파고 상승. 1월 25일-26일 및 1월 29일-30일은 1m-2m로 비교적 안정적.</li>
+                                    <li><strong class="text-primaryBlue">강수량:</strong> 1월 24일(토) 흐리고 눈, 낚시 및 시정에 지장. 1월 30일(금)에도 흐린 날씨 예상.</li>
+                                    <li><strong class="text-primaryBlue">시정:</strong> 1월 24일(눈)과 1월 30일(흐림) 시정 불량. 눈 내릴 때 주의 필요.</li>
+                                    <li><strong class="text-primaryBlue">기온/바람:</strong> 추위와 눈으로 인해 매우 낮은 체감 온도. 파고로 미루어 볼 때 바람의 영향 가능성 있음.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">추천 어종 및 전략</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">대상 어종:</strong> 우럭, 광어, 감성돔. 흐리고 파고 높은 날은 감성돔과 우럭에게 유리할 수 있음.</li>
+                                    <li><strong class="text-primaryBlue">낚시 전략:</strong>
+                                        <ul class="list-circle list-inside ml-4">
+                                            <li><strong class="text-primaryBlue">선상/갯바위 낚시:</strong> 파고 높은 날(1월 24일, 1월 27일-28일)은 극도로 주의. 잔잔한 시기(1월 25일-26일, 1월 29일-30일)를 선호.</li>
+                                            <li><strong class="text-primaryBlue">지형 활용:</strong> 만(灣)이나 수심이 얕은 곳 등 바람과 파도를 피할 수 있는 곳 공략. 감성돔과 우럭은 깊은 암초 지대 집중.</li>
+                                            <li><strong class="text-primaryBlue">미끼:</strong> 생미끼(지렁이, 새우, 갯지렁이)가 유리. 루어 낚시 시에는 느린 액션의 웜 또는 바닥 공략 메탈 지그 추천.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">해상 안전 수칙</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">악천후 대비:</strong> 1월 24일 눈과 3m 파고는 매우 위험. 출조 자제. 기상 악화 시 즉시 철수할 준비.</li>
+                                    <li><strong class="text-primaryBlue">시정 확보:</strong> 눈이나 흐린 날씨에는 시정이 어려움. 레이더, GPS 등 항해 장비 숙달 필수. 주간에도 항해등 사용.</li>
+                                    <li><strong class="text-primaryBlue">방한 및 방수:</strong> 추위와 눈으로 저체온증 및 동상 위험 높음. 방수/방풍 의류, 장갑, 모자, 미끄럼 방지 신발 착용.</li>
+                                    <li><strong class="text-primaryBlue">구명 장비:</strong> 모든 승선자 구명조끼 착용 필수. 비상용 구명 부환, 호각, 신호탄 등 비상 장비 확인.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">전문가 의견 및 요약</h4>
+                                <p class="text-gray-700 leading-relaxed mb-2">
+                                    주말 눈과 3m 파고로 인해 매우 위험한 상황 예상. 주중에도 기상 변화가 크므로 극도의 주의 필요. 비교적 잔잔한 주중을 노리고, 항상 최신 기상 확인 필수.
+                                </p>
+                                <p class="text-gray-700 leading-relaxed mb-2"><strong class="text-primaryBlue">전문가 종합 평가:</strong> <span class="text-dangerRed font-semibold">위험 ~ 보통</span></p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">주의가 필요한 날:</strong> 1월 24일 (토), 1월 27일 (화) - 28일 (수)</p>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- 남해서부 (South Sea Western) -->
+                    <div class="bg-lightBlue bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primaryBlue/30 hover:shadow-2xl hover:border-secondaryBlue/50 transition-all duration-300 cursor-pointer group animate-fade-in delay-300" onclick="toggleAccordion(this)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl md:text-2xl font-display font-semibold text-white group-hover:text-accentGreen">
+                                남해서부 (South Sea Western)
+                            </h3>
+                            <span class="text-white text-2xl group-hover:text-accentGreen transition-transform duration-300 transform group-[.active]:rotate-180">+</span>
+                        </div>
+                        <div class="accordion-content text-darkText mt-0 overflow-hidden text-lg">
+                            <div class="bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                                <p class="text-gray-700 leading-relaxed mb-4">
+                                    <strong class="text-primaryBlue">지역 개요:</strong> 리아스식 해안과 수많은 섬이 다양한 어종의 서식지로 우수. 주말 예보: 흐리고 비 또는 눈, 이후 대체로 흐림, 파고 1m ~ 3m.
+                                </p>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">날씨 영향 분석</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">파고:</strong> 1월 24일(토) 비/눈과 함께 1m-3m의 높은 파고. 1월 27일(화) - 28일(수)에도 다시 1m-3m로 파고 상승. 1월 25일-26일 및 1월 29일-30일은 1m-2m로 비교적 안정적.</li>
+                                    <li><strong class="text-primaryBlue">강수량:</strong> 1월 24일(토) 흐리고 비 또는 눈, 조업에 불편과 시정 감소. 1월 30일(금)에도 흐린 날씨 예상.</li>
+                                    <li><strong class="text-primaryBlue">시정:</strong> 1월 24일 비/눈과 흐린 날씨로 시정 감소.</li>
+                                    <li><strong class="text-primaryBlue">기온/바람:</strong> 추위와 강수로 매우 낮은 체감 온도. 높은 파고는 강한 바람을 동반할 가능성, 방한 준비 필수.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">추천 어종 및 전략</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">대상 어종:</strong> 감성돔, 참돔, 우럭, 볼락. 겨울 감성돔 낚시로 유명한 지역; 비가 오히려 감성돔 활성도를 높일 수 있음.</li>
+                                    <li><strong class="text-primaryBlue">낚시 전략:</strong>
+                                        <ul class="list-circle list-inside ml-4">
+                                            <li><strong class="text-primaryBlue">갯바위 낚시:</strong> 파고 높은 날(1월 24일)은 위험. 잔잔한 시기(1월 25일-26일, 1월 29일-30일)와 파도 영향을 덜 받는 내만권 선호.</li>
+                                            <li><strong class="text-primaryBlue">선상 낚시:</strong> 잔잔한 시기를 택하여 깊은 암초 지대 또는 수중 여(麗)를 공략.</li>
+                                            <li><strong class="text-primaryBlue">미끼:</strong> 감성돔은 크릴, 옥수수, 붉은 새우. 우럭/볼락은 지렁이, 새우. 저활성 어종에는 생미끼가 효과적.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">해상 안전 수칙</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">악천후 경고:</strong> 1월 24일(비/눈)과 3m 파고는 매우 위험. 출조 자제. 기상 악화 시 즉시 대피 또는 철수.</li>
+                                    <li><strong class="text-primaryBlue">미끄럼 및 저체온증:</strong> 비/눈으로 갑판 및 갯바위 매우 미끄러움. 미끄럼 방지 신발 착용. 젖은 옷은 즉시 갈아입고 방수/방풍 의류로 저체온증 예방.</li>
+                                    <li><strong class="text-primaryBlue">비상 연락망:</strong> 가족/지인에게 출조 계획 알리고 통신 장비 휴대.</li>
+                                    <li><strong class="text-primaryBlue">기상 변화 모니터링:</strong> 해상 예보는 급변할 수 있으므로, 출조 전후 항상 최신 해상 특보 및 예보 확인.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">전문가 의견 및 요약</h4>
+                                <p class="text-gray-700 leading-relaxed mb-2">
+                                    1월 24일(비/눈, 3m 파고)은 매우 위험한 상황 예상. 1월 27일-28일에도 파고 상승으로 해상 활동 자제. 잔잔한 시기(1월 25일-26일, 1월 29일-30일) 내만권 공략 시 조황 기대. 안전 최우선.
+                                </p>
+                                <p class="text-gray-700 leading-relaxed mb-2"><strong class="text-primaryBlue">전문가 종합 평가:</strong> <span class="text-dangerRed font-semibold">위험 ~ 보통</span></p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">주의가 필요한 날:</strong> 1월 24일 (토), 1월 27일 (화) - 28일 (수)</p>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- 남해동부 (South Sea Eastern) -->
+                    <div class="bg-lightBlue bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primaryBlue/30 hover:shadow-2xl hover:border-secondaryBlue/50 transition-all duration-300 cursor-pointer group animate-fade-in delay-300" onclick="toggleAccordion(this)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl md:text-2xl font-display font-semibold text-white group-hover:text-accentGreen">
+                                남해동부 (South Sea Eastern)
+                            </h3>
+                            <span class="text-white text-2xl group-hover:text-accentGreen transition-transform duration-300 transform group-[.active]:rotate-180">+</span>
+                        </div>
+                        <div class="accordion-content text-darkText mt-0 overflow-hidden text-lg">
+                            <div class="bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                                <p class="text-gray-700 leading-relaxed mb-4">
+                                    <strong class="text-primaryBlue">지역 개요:</strong> 비교적 깊은 수심과 덜 복잡한 해류가 다양한 어종 서식에 기여, 겨울 볼락 낚시로 유명. 이번 주: 대체로 흐림, 1월 26일(월) 오후부터 27일(화)까지 비 가능성. 파고 1m ~ 3m.
+                                </p>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">날씨 영향 분석</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">파고:</strong> 1월 24일-25일(토-일) 및 1월 27일-28일(화-수) 1m-3m의 높은 파고. 1월 26일(월)과 1월 29일-30일(목-금)은 1m-2m로 비교적 잔잔.</li>
+                                    <li><strong class="text-primaryBlue">강수량:</strong> 1월 26일(월) 오후부터 27일(화)까지 비 예상, 낚시에 지장 가능성. 1월 27일(화) 흐리고 비 예보.</li>
+                                    <li><strong class="text-primaryBlue">시정:</strong> 비 내리는 동안 시정 감소. 그 외에는 흐린 날씨로 대체로 양호.</li>
+                                    <li><strong class="text-primaryBlue">기온/바람:</strong> 낮은 겨울 기온에 비가 겹쳐 체감 온도가 크게 낮아질 것. 높은 파고는 강한 바람을 동반할 수 있으므로 방한 및 방수 준비 필요.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">추천 어종 및 전략</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">대상 어종:</strong> 감성돔, 참돔, 우럭, 볼락. 겨울 감성돔과 볼락 낚시로 유명. 비 오는 날은 감성돔 조황이 좋아지기도 함.</li>
+                                    <li><strong class="text-primaryBlue">낚시 전략:</strong>
+                                        <ul class="list-circle list-inside ml-4">
+                                            <li><strong class="text-primaryBlue">갯바위 낚시:</strong> 3m 파고는 매우 위험. 1월 24일-25일 및 1월 27일-28일은 자제. 잔잔한 시기(1월 26일, 1월 29일-30일)에 파도 영향을 덜 받는 내만권 선호. 비 오는 날 간조 시간대 물골 공략.</li>
+                                            <li><strong class="text-primaryBlue">선상 낚시:</strong> 잔잔한 시기(파고 2m 이하)에 먼바다 열기/볼락 낚시 고려.</li>
+                                            <li><strong class="text-primaryBlue">미끼:</strong> 감성돔은 크릴, 옥수수, 떡밥. 열기/볼락은 지렁이, 새우. 루어 낚시 시 소형 메탈 지그나 웜을 이용한 바닥 공략.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">해상 안전 수칙</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">높은 파고 경고:</strong> 1월 24일-25일, 1월 27일-28일 3m 파고는 매우 위험. 갯바위 낚시 및 소형 선박 출조 자제. 기상 악화 시 즉시 피항 또는 철수.</li>
+                                    <li><strong class="text-primaryBlue">비 오는 날 주의:</strong> 갑판 및 갯바위 미끄러움. 방수 의류 착용으로 저체온증 예방.</li>
+                                    <li><strong class="text-primaryBlue">비상 통신:</strong> 항상 통신 장비 휴대 및 작동 확인.</li>
+                                    <li><strong class="text-primaryBlue">기상 변화 모니터링:</strong> 최신 해상 특보 및 예보를 지속적으로 확인.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">전문가 의견 및 요약</h4>
+                                <p class="text-gray-700 leading-relaxed mb-2">
+                                    주말 및 주중 높은 파고(최대 3m)와 비 예보로 주의 필요. 갯바위 낚시 및 소형 선박 출조는 매우 위험. 잔잔한 시기(1월 26일, 1월 29일-30일)에 파도 영향을 덜 받는 내만권 공략이 유리. 안전 최우선.
+                                </p>
+                                <p class="text-gray-700 leading-relaxed mb-2"><strong class="text-primaryBlue">전문가 종합 평가:</strong> <span class="text-dangerRed font-semibold">위험 ~ 보통</span></p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">주의가 필요한 날:</strong> 1월 24일 (토) - 25일 (일), 1월 27일 (화) - 28일 (수)</p>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- 제주도해상 (Jeju Island Waters) -->
+                    <div class="bg-lightBlue bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primaryBlue/30 hover:shadow-2xl hover:border-secondaryBlue/50 transition-all duration-300 cursor-pointer group animate-fade-in delay-300" onclick="toggleAccordion(this)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl md:text-2xl font-display font-semibold text-white group-hover:text-accentGreen">
+                                제주도해상 (Jeju Island Waters)
+                            </h3>
+                            <span class="text-white text-2xl group-hover:text-accentGreen transition-transform duration-300 transform group-[.active]:rotate-180">+</span>
+                        </div>
+                        <div class="accordion-content text-darkText mt-0 overflow-hidden text-lg">
+                            <div class="bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                                <p class="text-gray-700 leading-relaxed mb-4">
+                                    <strong class="text-primaryBlue">지역 개요:</strong> 깊은 수심, 강한 조류, 다양한 수중 지형이 풍부한 어자원(대형 어종 포함)을 지지. 주말 및 1월 26일(월) 오후: 비 또는 눈 예보, 대체로 흐림, 파고 1m ~ 3m.
+                                </p>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">날씨 영향 분석</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">파고:</strong> 1월 24일(토) 비/눈과 함께 1m-3m의 높은 파고. 1월 25일-30일은 1m-2m로 안정적.</li>
+                                    <li><strong class="text-primaryBlue">강수량:</strong> 1월 24일(토) 오전, 1월 26일(월) 오후 비 또는 눈 예보. 지속적인 흐린 날씨는 강한 바람과 함께 체감 온도를 낮출 수 있음.</li>
+                                    <li><strong class="text-primaryBlue">시정:</strong> 비 또는 눈이 내릴 때 시정 감소. 지속적인 흐린 날씨로 대체로 주의 필요.</li>
+                                    <li><strong class="text-primaryBlue">기온/바람:</strong> 낮은 겨울 기온과 강한 바람이 특징. 높은 파고는 강한 바람을 동반할 수 있으므로 철저한 방한 준비 필요.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">추천 어종 및 전략</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">대상 어종:</strong> 방어, 부시리, 참돔, 벵에돔, 쏨뱅이. 제주도는 겨울 방어 지깅의 메카이지만, 기상 악화로 출조 제한될 수 있음.</li>
+                                    <li><strong class="text-primaryBlue">낚시 전략:</strong>
+                                        <ul class="list-circle list-inside ml-4">
+                                            <li><strong class="text-primaryBlue">선상 낚시 (지깅/타이라바):</strong> 1월 24일(비/눈, 3m 파고)은 출조 자제. 파고가 안정되는 1월 25일-30일 중 비 없는 날에 출조 계획. 수중 여(麗) 또는 암초 지대에서 방어/부시리 지깅, 참돔 타이라바 공략.</li>
+                                            <li><strong class="text-primaryBlue">갯바위 낚시:</strong> 파고 1m-2m로 잔잔하고 비/눈 없는 날 벵에돔, 참돔 공략 가능. 크릴, 빵가루 미끼 사용.</li>
+                                            <li><strong class="text-primaryBlue">미끼:</strong> 루어 낚시가 일반적. 저수온기에는 자연스러운 루어 액션이 중요.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">해상 안전 수칙</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">악천후 출조 금지:</strong> 1월 24일(비/눈, 3m 파고)은 극히 위험. 모든 해상 활동 중단.</li>
+                                    <li><strong class="text-primaryBlue">기상 변화 예측:</strong> 제주 해상은 기상 변화가 잦고 예측 어려움. 최신 해상 특보 지속 확인. 기상 급변 시 즉시 대피 또는 철수.</li>
+                                    <li><strong class="text-primaryBlue">방수 및 방한 장비:</strong> 비/눈, 낮은 기온, 강풍으로 저체온증 위험 높음. 완전 방수/방풍 의류, 장갑, 모자, 미끄럼 방지 신발 착용.</li>
+                                    <li><strong class="text-primaryBlue">항해 안전:</strong> 흐리거나 비 오는 날 시정 제한. 레이더 및 GPS 활용, 안전 속도 유지.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">전문가 의견 및 요약</h4>
+                                <p class="text-gray-700 leading-relaxed mb-2">
+                                    1월 24일은 비/눈과 높은 파고로 극히 위험. 1월 25일부터 파고가 안정(1m-2m)되는 점을 감안하여 출조 계획, 단 1월 26일 오후 비 예보 유의. 대형 어종 공략 시 기상 상황 철저히 판단. 안전 장비 및 방한 준비 필수.
+                                </p>
+                                <p class="text-gray-700 leading-relaxed mb-2"><strong class="text-primaryBlue">전문가 종합 평가:</strong> <span class="text-dangerRed font-semibold">위험 ~ 보통</span></p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">주의가 필요한 날:</strong> 1월 24일 (토), 1월 26일 (월) 오후</p>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- 동해남부 (East Sea Southern) -->
+                    <div class="bg-lightBlue bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primaryBlue/30 hover:shadow-2xl hover:border-secondaryBlue/50 transition-all duration-300 cursor-pointer group animate-fade-in delay-300" onclick="toggleAccordion(this)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl md:text-2xl font-display font-semibold text-white group-hover:text-accentGreen">
+                                동해남부 (East Sea Southern)
+                            </h3>
+                            <span class="text-white text-2xl group-hover:text-accentGreen transition-transform duration-300 transform group-[.active]:rotate-180">+</span>
+                        </div>
+                        <div class="accordion-content text-darkText mt-0 overflow-hidden text-lg">
+                            <div class="bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                                <p class="text-gray-700 leading-relaxed mb-4">
+                                    <strong class="text-primaryBlue">지역 개요:</strong> 깊고 맑은 수심, 겨울 심해 낚시(대구, 열기)로 유명. 이번 주: 대체로 흐림, 1월 28일(수)까지 지속적인 눈 예보. 파고 최대 4m.
+                                </p>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">날씨 영향 분석</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">파고:</strong> 1월 24일-25일(토-일) 1m-4m의 매우 높은 파고 예상. 1월 26일(월)은 1m-2.5m, 1월 27일-30일은 1m-2m로 안정화. 주말 높은 파고는 모든 해상 활동 위험.</li>
+                                    <li><strong class="text-primaryBlue">강수량:</strong> 1월 28일(수)까지 지속적인 눈 예상. 눈은 낚시에 큰 지장과 시정 감소, 저체온증 위험 증가.</li>
+                                    <li><strong class="text-primaryBlue">시정:</strong> 지속적인 눈과 흐린 날씨로 시정 매우 불량.</li>
+                                    <li><strong class="text-primaryBlue">기온/바람:</strong> 매우 추운 겨울 날씨. 4m 파고는 매우 강한 바람을 의미하며, 극도로 낮은 체감 온도.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">추천 어종 및 전략</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">대상 어종:</strong> 대구, 열기, 볼락. 동해남부 겨울 어종, 주로 깊은 수심에서 활동.</li>
+                                    <li><strong class="text-primaryBlue">낚시 전략:</strong>
+                                        <ul class="list-circle list-inside ml-4">
+                                            <li><strong class="text-primaryBlue">선상 낚시:</strong> 1월 24일-25일 4m 파고는 선상 낚시 불가능. 1월 26일(2.5m)도 위험. 파고가 1m-2m로 안정되는 1월 27일부터 출조 고려, 대구, 열기 낚시. 어탐기를 이용해 100m 이상 수심에서 어군 탐색.</li>
+                                            <li><strong class="text-primaryBlue">미끼:</strong> 대구는 오징어 미끼 선호. 열기/볼락은 지렁이나 크릴을 사용한 채비.</li>
+                                            <li><strong class="text-primaryBlue">낚시 포인트:</strong> 높은 파고로 방파제, 갯바위 등은 피할 것.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">해상 안전 수칙</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">극심한 위험 경고:</strong> 1월 24일-25일 4m 파고와 눈은 모든 해상 활동이 극히 위험. 출조 절대 금지. 해상 사고 위험 매우 높음. (해경 기준 파고 2m 이상 시 선박 위험, 3m 이상 시 모든 선박 위험)</li>
+                                    <li><strong class="text-primaryBlue">저체온증 및 동상:</strong> 눈, 낮은 기온, 강풍으로 심각한 위험. 완전 방한 복장(방수/방풍 의류, 장갑, 모자) 착용. 따뜻한 음료 및 여벌 옷 준비.</li>
+                                    <li><strong class="text-primaryBlue">불량 시정:</strong> 눈과 흐린 날씨로 충돌 위험 높음. 출조 연기 고려.</li>
+                                    <li><strong class="text-primaryBlue">비상 장비:</strong> 구명조끼, 구명 부환, 조난 신호기, 구급약품 등 비상 장비 확인 및 사용법 숙지.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">전문가 의견 및 요약</h4>
+                                <p class="text-gray-700 leading-relaxed mb-2">
+                                    이번 주말 4m 파고와 눈으로 극히 위험한 상황 예상. 1월 28일까지 눈 예보. 모든 낚시 활동은 파고가 2m 이하로 안정되는 1월 27일 이후로 연기해야 합니다. 주말에는 인명 피해 위험이 있으므로 절대 출조 금지.
+                                </p>
+                                <p class="text-gray-700 leading-relaxed mb-2"><strong class="text-primaryBlue">전문가 종합 평가:</strong> <span class="text-dangerRed font-semibold">극히 위험 ~ 위험</span></p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">절대 출조 금지:</strong> 1월 24일 (토) - 25일 (일)</p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">주의가 필요한 날:</strong> 1월 26일 (월) - 28일 (수)</p>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- 동해중부 (East Sea Central) -->
+                    <div class="bg-lightBlue bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primaryBlue/30 hover:shadow-2xl hover:border-secondaryBlue/50 transition-all duration-300 cursor-pointer group animate-fade-in delay-300" onclick="toggleAccordion(this)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl md:text-2xl font-display font-semibold text-white group-hover:text-accentGreen">
+                                동해중부 (East Sea Central)
+                            </h3>
+                            <span class="text-white text-2xl group-hover:text-accentGreen transition-transform duration-300 transform group-[.active]:rotate-180">+</span>
+                        </div>
+                        <div class="accordion-content text-darkText mt-0 overflow-hidden text-lg">
+                            <div class="bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                                <p class="text-gray-700 leading-relaxed mb-4">
+                                    <strong class="text-primaryBlue">지역 개요:</strong> 전형적인 동해의 깊고 맑은 수심, 풍부한 겨울 조황(대구, 열기). 1월 25일(일)부터 눈과 함께 대체로 흐림. 파고 1m ~ 4m.
+                                </p>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">날씨 영향 분석</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">파고:</strong> 1월 24일-25일(토-일) 1m-4m의 매우 높은 파고 예상. 1월 27일-29일(화-목)에도 1m-3m로 다시 파고 상승, 해상 활동에 큰 제약. 1월 26일(월)과 1월 30일(금)은 1m-2m로 비교적 잔잔.</li>
+                                    <li><strong class="text-primaryBlue">강수량:</strong> 1월 25일(일) 오후와 1월 26일(월)을 제외하고 대부분 눈과 함께 흐린 날씨 예상. 잦은 눈은 낚시에 지장을 주고 안전 위협.</li>
+                                    <li><strong class="text-primaryBlue">시정:</strong> 눈과 흐린 날씨로 한 주 내내 시정 매우 불량.</li>
+                                    <li><strong class="text-primaryBlue">기온/바람:</strong> 매우 추운 겨울 날씨. 높은 파고는 강한 바람을 의미하며, 저체온증 위험 최고조.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">추천 어종 및 전략</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">대상 어종:</strong> 대구, 열기, 볼락. 동해중부 겨울 핵심 어종, 주로 깊은 수심에서 활동.</li>
+                                    <li><strong class="text-primaryBlue">낚시 전략:</strong>
+                                        <ul class="list-circle list-inside ml-4">
+                                            <li><strong class="text-primaryBlue">선상 낚시:</strong> 1월 24일-25일 4m 파고와 눈은 선상 낚시 불가능. 1월 27일-29일 3m 파고도 매우 위험. 파고가 잔잔(1m-2m)해지는 1월 26일(월)과 1월 30일(금)에 대구, 열기 선상 낚시 고려. 깊은 수심에서 어탐기로 어군 탐색이 중요.</li>
+                                            <li><strong class="text-primaryBlue">미끼:</strong> 대구는 오징어 미끼 선호. 열기/볼락은 지렁이나 크릴을 사용한 채비.</li>
+                                            <li><strong class="text-primaryBlue">낚시 포인트:</strong> 높은 파고로 방파제, 갯바위 등은 피할 것.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">해상 안전 수칙</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">극심한 위험 경고:</strong> 주말 및 주중 3m-4m 파고와 눈 예보로 모든 해상 활동이 극히 위험. 출조 절대 금지. 해상 사고 위험 매우 높음.</li>
+                                    <li><strong class="text-primaryBlue">저체온증 및 동상 예방:</strong> 눈, 낮은 기온, 강풍으로 심각한 위험. 완전 방수/방풍 의류, 장갑, 모자, 안면 마스크 등 완전 방한 복장 착용. 따뜻한 음료 및 여벌 옷 준비.</li>
+                                    <li><strong class="text-primaryBlue">불량 시정 대비:</strong> 눈과 흐린 날씨로 시정 심각하게 제한. 레이더 및 GPS 활용 숙달. 주간에도 항해등 사용으로 충돌 예방.</li>
+                                    <li><strong class="text-primaryBlue">통신 및 안전 장비 확인:</strong> 출항 전 출조 계획 고지. 통신 장비 및 구명 장비 확인.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">전문가 의견 및 요약</h4>
+                                <p class="text-gray-700 leading-relaxed mb-2">
+                                    주말 및 주중 파고 최대 3m-4m와 눈 예보로 극히 위험한 상황 예상. 1월 24일-25일은 절대 출조 금지. 1월 26일과 1월 30일은 파고가 잔잔하나, 눈 예보 재확인 및 철저한 방한, 안전 장비 준비 필수. 출조 결정 시 안전 최우선.
+                                </p>
+                                <p class="text-gray-700 leading-relaxed mb-2"><strong class="text-primaryBlue">전문가 종합 평가:</strong> <span class="text-dangerRed font-semibold">극히 위험 ~ 위험</span></p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">절대 출조 금지:</strong> 1월 24일 (토) - 25일 (일), 1월 27일 (화) - 29일 (목)</p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">주의가 필요한 날:</strong> 1월 26일 (월), 1월 30일 (금)</p>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- 서해북부 (West Sea Northern) -->
+                    <div class="bg-lightBlue bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primaryBlue/30 hover:shadow-2xl hover:border-secondaryBlue/50 transition-all duration-300 cursor-pointer group animate-fade-in delay-300" onclick="toggleAccordion(this)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl md:text-2xl font-display font-semibold text-white group-hover:text-accentGreen">
+                                서해북부 (West Sea Northern)
+                            </h3>
+                            <span class="text-white text-2xl group-hover:text-accentGreen transition-transform duration-300 transform group-[.active]:rotate-180">+</span>
+                        </div>
+                        <div class="accordion-content text-darkText mt-0 overflow-hidden text-lg">
+                            <div class="bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                                <p class="text-gray-700 leading-relaxed mb-4">
+                                    <strong class="text-primaryBlue">지역 개요:</strong> 서해중부와 유사, 비교적 얕은 수심, 큰 조수간만 차, 다양한 어종 서식. 이번 주: 대체로 맑거나 흐림. 파고 0.5m ~ 2.5m로 비교적 잔잔.
+                                </p>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">날씨 영향 분석</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">파고:</strong> 대체로 0.5m-2m로 안정적이나, 1월 24일(토) 오후 2.5m로 약간 높아질 수 있습니다. 1월 26일(월)이 0.5m-1.5m로 가장 잔잔.</li>
+                                    <li><strong class="text-primaryBlue">강수량:</strong> 한 주 내내 비 예보 없음, 쾌적한 낚시 여건.</li>
+                                    <li><strong class="text-primaryBlue">시정:</strong> 맑거나 흐린 날씨로 시정 양호.</li>
+                                    <li><strong class="text-primaryBlue">기온/바람:</strong> 낮은 수온과 겨울철 찬 바람 예상. 파고가 잔잔해도 바람은 체감 추위를 높일 수 있음.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">추천 어종 및 전략</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">대상 어종:</strong> 우럭, 광어, 노래미. 서해북부 겨울 대표 어종.</li>
+                                    <li><strong class="text-primaryBlue">낚시 전략:</strong>
+                                        <ul class="list-circle list-inside ml-4">
+                                            <li><strong class="text-primaryBlue">선상/갯바위 루어 낚시:</strong> 잔잔한 날(1월 26일)에 유리. 지그헤드와 웜 또는 메탈 지그를 이용한 바닥 공략 효과적.</li>
+                                            <li><strong class="text-primaryBlue">원투 낚시:</strong> 모래/뻘 지형의 광어나 가자미류 대상, 지렁이나 새우 미끼 사용.</li>
+                                            <li><strong class="text-primaryBlue">집중 공략:</strong> 저수온기 어군 분산 가능성 있어 한 포인트에 대한 끈기 있는 공략이 중요.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">해상 안전 수칙</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">선박 운항:</strong> 1월 24일 오후 파고 2.5m는 소형 선박에 부담. 출항 전 날씨 변화 확인. 높은 파고 시 내만권 낚시 또는 출조 연기 권고.</li>
+                                    <li><strong class="text-primaryBlue">갯바위 낚시:</strong> 1월 24일 오후 너울성 파도에 주의. 구명조끼 착용 및 미끄럼 방지 신발 필수.</li>
+                                    <li><strong class="text-primaryBlue">저체온증 예방:</strong> 방수 및 방풍 의류 착용, 따뜻한 음료 및 여벌 옷 준비.</li>
+                                    <li><strong class="text-primaryBlue">지속적인 날씨 확인:</strong> 기상 예보는 변동될 수 있으므로 최신 정보 지속 확인.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">전문가 의견 및 요약</h4>
+                                <p class="text-gray-700 leading-relaxed mb-2">
+                                    1월 24일 오후를 제외하고는 대체로 양호한 조황이 기대됩니다. 1월 26일(월)은 소형 선박 출조 및 갯바위 낚시에 최적의 날입니다. 저수온 대비 철저한 준비가 필요합니다.
+                                </p>
+                                <p class="text-gray-700 leading-relaxed mb-2"><strong class="text-primaryBlue">전문가 종합 평가:</strong> <span class="text-accentGreen font-semibold">보통 ~ 좋음</span></p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">최적의 날:</strong> 1월 26일 (월) 오전/오후</p>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- 동해북부 (East Sea Northern) -->
+                    <div class="bg-lightBlue bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primaryBlue/30 hover:shadow-2xl hover:border-secondaryBlue/50 transition-all duration-300 cursor-pointer group animate-fade-in delay-300" onclick="toggleAccordion(this)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl md:text-2xl font-display font-semibold text-white group-hover:text-accentGreen">
+                                동해북부 (East Sea Northern)
+                            </h3>
+                            <span class="text-white text-2xl group-hover:text-accentGreen transition-transform duration-300 transform group-[.active]:rotate-180">+</span>
+                        </div>
+                        <div class="accordion-content text-darkText mt-0 overflow-hidden text-lg">
+                            <div class="bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                                <p class="text-gray-700 leading-relaxed mb-4">
+                                    <strong class="text-primaryBlue">지역 개요:</strong> 다른 동해 지역보다 깊고 찬 수심, 주로 심해 어종 서식. 이번 주말, 1월 26일(월) 오후, 1월 27일(화) 오전: 눈 예보. 파고 1m ~ 4m.
+                                </p>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">날씨 영향 분석</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">파고:</strong> 1월 24일-25일(토-일) 1m-4m의 매우 높은 파고 예상. 1월 27일-29일(화-목)에도 1m-3m로 다시 파고 상승, 해상 활동에 큰 제약. 1월 26일(월)과 1월 30일(금)은 1m-2m로 비교적 잔잔.</li>
+                                    <li><strong class="text-primaryBlue">강수량:</strong> 주말(1월 24일 오전, 25일 오전), 1월 26일(월) 오후, 1월 27일(화) 오전 눈 예보. 잦은 눈은 낚시에 지장을 주고 안전 위협.</li>
+                                    <li><strong class="text-primaryBlue">시정:</strong> 눈과 흐린 날씨로 한 주 내내 시정 매우 불량.</li>
+                                    <li><strong class="text-primaryBlue">기온/바람:</strong> 매우 추운 겨울 날씨. 4m 파고는 강한 바람을 의미하며, 저체온증 위험 최고조.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">추천 어종 및 전략</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">대상 어종:</strong> 대구, 열기, 임연수어, 꼼치. 동해북부 겨울 핵심 어종, 주로 깊은 수심에서 활동.</li>
+                                    <li><strong class="text-primaryBlue">낚시 전략:</strong>
+                                        <ul class="list-circle list-inside ml-4">
+                                            <li><strong class="text-primaryBlue">선상 낚시:</strong> 1월 24일-25일 4m 파고와 눈은 선상 낚시 불가능. 1월 27일-29일 3m 파고도 매우 위험. 파고가 잔잔(1m-2m)해지는 1월 26일(월)과 1월 30일(금)에 대구, 열기 선상 낚시 고려. 깊은 수심에서 어탐기로 어군 탐색이 중요.</li>
+                                            <li><strong class="text-primaryBlue">미끼:</strong> 대구는 오징어 미끼 선호. 열기/임연수어는 지렁이나 크릴을 사용한 채비.</li>
+                                            <li><strong class="text-primaryBlue">낚시 포인트:</strong> 높은 파고로 방파제, 갯바위 등은 피할 것.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">해상 안전 수칙</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">극심한 위험 경고:</strong> 주말 및 주중 3m-4m 파고와 눈 예보로 모든 해상 활동이 극히 위험. 출조 절대 금지. 해상 사고 위험 매우 높음.</li>
+                                    <li><strong class="text-primaryBlue">저체온증 및 동상 예방:</strong> 눈, 낮은 기온, 강풍으로 심각한 위험. 완전 방수/방풍 의류, 장갑, 모자, 안면 마스크 등 완전 방한 복장 착용. 따뜻한 음료 및 여벌 옷 준비.</li>
+                                    <li><strong class="text-primaryBlue">불량 시정 대비:</strong> 눈과 흐린 날씨로 시정 심각하게 제한. 레이더 및 GPS 활용 숙달. 주간에도 항해등 사용으로 충돌 예방.</li>
+                                    <li><strong class="text-primaryBlue">통신 및 안전 장비 확인:</strong> 출항 전 출조 계획 고지. 통신 장비 및 구명 장비 확인.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">전문가 의견 및 요약</h4>
+                                <p class="text-gray-700 leading-relaxed mb-2">
+                                    주말 및 주중 파고 최대 3m-4m와 눈 예보로 극히 위험한 상황 예상. 1월 24일-25일은 절대 출조 금지. 1월 26일과 1월 30일은 파고가 잔잔하나, 눈 예보 재확인 및 철저한 방한, 안전 장비 준비 필수. 출조 결정 시 안전 최우선.
+                                </p>
+                                <p class="text-gray-700 leading-relaxed mb-2"><strong class="text-primaryBlue">전문가 종합 평가:</strong> <span class="text-dangerRed font-semibold">극히 위험 ~ 위험</span></p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">절대 출조 금지:</strong> 1월 24일 (토) - 25일 (일), 1월 27일 (화) - 29일 (목)</p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">주의가 필요한 날:</strong> 1월 26일 (월), 1월 30일 (금)</p>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- 규슈 해상 (Kyushu Waters - Korean Border and Vicinity) -->
+                    <div class="bg-lightBlue bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-primaryBlue/30 hover:shadow-2xl hover:border-secondaryBlue/50 transition-all duration-300 cursor-pointer group animate-fade-in delay-300" onclick="toggleAccordion(this)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl md:text-2xl font-display font-semibold text-white group-hover:text-accentGreen">
+                                규슈 해상 (Kyushu Waters - Korean Border and Vicinity)
+                            </h3>
+                            <span class="text-white text-2xl group-hover:text-accentGreen transition-transform duration-300 transform group-[.active]:rotate-180">+</span>
+                        </div>
+                        <div class="accordion-content text-darkText mt-0 overflow-hidden text-lg">
+                            <div class="bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                                <p class="text-gray-700 leading-relaxed mb-4">
+                                    <strong class="text-primaryBlue">지역 개요:</strong> 쓰시마 해류 영향, 비교적 따뜻한 해수가 다양한 회유성 및 정착성 어종 서식에 기여. 주말 및 1월 26일(월) 오후: 비 예보, 대체로 흐림, 파고 1m ~ 3m.
+                                </p>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">날씨 영향 분석</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">파고:</strong> 1월 24일-26일(토-월) 1m-3m의 높은 파고 예상, 비와 함께 해상 활동에 영향 가능성. 1월 27일-30일(화-금)은 1m-2m로 안정적.</li>
+                                    <li><strong class="text-primaryBlue">강수량:</strong> 1월 24일(토) 및 1월 26일(월) 오후 비 예보, 낚시에 불편 초래 가능.</li>
+                                    <li><strong class="text-primaryBlue">시정:</strong> 비와 흐린 날씨로 시정 감소.</li>
+                                    <li><strong class="text-primaryBlue">기온/바람:</strong> 쓰시마 해류 영향으로 본토 해역보다 비교적 온화하나, 비와 3m 파고는 강한 바람과 낮은 체감 온도를 가져올 수 있으므로 방한 및 방수 준비 필요.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">추천 어종 및 전략</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">대상 어종:</strong> 방어, 부시리, 참돔, 벵에돔. 대형 회유성 어종 및 겨울 갯바위 낚시로 유명.</li>
+                                    <li><strong class="text-primaryBlue">낚시 전략:</strong>
+                                        <ul class="list-circle list-inside ml-4">
+                                            <li><strong class="text-primaryBlue">선상 낚시 (지깅/타이라바):</strong> 1월 24일(비, 3m 파고) 및 1월 26일(비, 3m 파고)은 출조 자제. 파고가 안정되는 1월 27일-30일에 출조 고려. 어탐기를 이용해 수중 여(麗) 또는 암초 지대에서 방어/부시리 지깅, 참돔 타이라바 공략.</li>
+                                            <li><strong class="text-primaryBlue">갯바위 낚시:</strong> 3m 파고는 위험. 잔잔한 시기(1월 27일-30일)에 파도 영향을 덜 받는 갯바위 포인트에서 벵에돔, 참돔 공략.</li>
+                                            <li><strong class="text-primaryBlue">미끼:</strong> 루어 낚시가 일반적. 메탈 지그, 탑워터 루어, 소프트 웜 사용. 참돔은 타이라바 전용 루어.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">해상 안전 수칙</h4>
+                                <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                                    <li><strong class="text-primaryBlue">악천후 출조 자제:</strong> 1월 24일 및 1월 26일 오후 비와 3m 파고는 위험. 예보 재확인 및 무리한 출조 자제.</li>
+                                    <li><strong class="text-primaryBlue">미끄럼 및 저체온증:</strong> 비로 갑판 및 갯바위 미끄러움. 방수 및 방풍 의류 착용으로 저체온증 예방.</li>
+                                    <li><strong class="text-primaryBlue">해상 교통 안전:</strong> 흐리거나 비 오는 날 시정 제한. 안전 속도 유지 및 항해 장비 활용하여 충돌 예방.</li>
+                                    <li><strong class="text-primaryBlue">국제 해역 주의:</strong> 해당 해역은 국제 해역이므로 관련 규정 및 절차 준수. 출항 전 정보 확인.</li>
+                                </ul>
+                                <h4 class="font-display font-medium text-lg text-primaryBlue mt-4 mb-2">전문가 의견 및 요약</h4>
+                                <p class="text-gray-700 leading-relaxed mb-2">
+                                    이번 주말 및 1월 26일 오후 비와 3m 파고로 기상 불안정, 주의 또는 출조 자제 필요. 파고가 안정(1m-2m)되고 비 예보 없는 1월 27일-30일 출조 계획이 유리. 철저한 안전 장비 및 방한 준비 필수.
+                                </p>
+                                <p class="text-gray-700 leading-relaxed mb-2"><strong class="text-primaryBlue">전문가 종합 평가:</strong> <span class="text-dangerRed font-semibold">위험 ~ 보통</span></p>
+                                <p class="text-gray-700 leading-relaxed"><strong class="text-primaryBlue">주의가 필요한 날:</strong> 1월 24일 (토), 1월 26일 (월) 오후</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Infographic Prompts Section -->
+            <section>
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-8 text-center animate-fade-in delay-400">
+                    지역별 해양 날씨 한눈에 보기
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in delay-500">
+                    <!-- Infographic Card: 서해중부 (West Sea Central) -->
+                    <div class="bg-gradient-to-br from-lightBlue/15 to-primaryBlue/20 p-6 rounded-xl shadow-xl border border-primaryBlue/30 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                        <h3 class="text-xl md:text-2xl font-display font-semibold text-white mb-3">
+                            서해중부 (West Sea Central)
+                        </h3>
+                        <div class="flex items-center text-accentGreen text-lg mb-2">
+                            <span class="mr-2 text-2xl">🌤️</span> <span>변덕스러운 날씨 (흐림 ~ 맑음)</span>
+                        </div>
+                        <p class="text-lightText/90 mb-3">
+                            <strong class="text-primaryBlue">예보 (1/24-30):</strong> 변덕스러운 하늘 (흐림~맑음), 파고 0.5m-2.5m.
+                        </p>
+                        <div class="bg-primaryBlue/40 rounded-full h-2 flex overflow-hidden">
+                            <div class="bg-accentGreen" style="width: 20%;" title="파고: 0.5m"></div>
+                            <div class="bg-warningYellow" style="width: 50%;" title="파고: 1.5m"></div>
+                            <div class="bg-dangerRed" style="width: 30%;" title="파고: 2.5m"></div>
+                        </div>
+                        <p class="text-lightText/70 text-sm mt-2">최저 0.5m ~ 최대 2.5m (1/24 오후 높은 파고 주의)</p>
+                    </div>
+
+                    <!-- Infographic Card: 서해남부 (West Sea Southern) -->
+                    <div class="bg-gradient-to-br from-lightBlue/15 to-primaryBlue/20 p-6 rounded-xl shadow-xl border border-primaryBlue/30 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                        <h3 class="text-xl md:text-2xl font-display font-semibold text-white mb-3">
+                            서해남부 (West Sea Southern)
+                        </h3>
+                        <div class="flex items-center text-accentGreen text-lg mb-2">
+                            <span class="mr-2 text-2xl">🌨️</span> <span>주말 흐리고 눈, 이후 대체로 흐림</span>
+                        </div>
+                        <p class="text-lightText/90 mb-3">
+                            <strong class="text-primaryBlue">예보 (1/24-30):</strong> 주말 흐리고 눈, 이후 대체로 흐림, 파고 1m-3m.
+                        </p>
+                        <div class="bg-primaryBlue/40 rounded-full h-2 flex overflow-hidden">
+                            <div class="bg-warningYellow" style="width: 33%;" title="파고: 1m"></div>
+                            <div class="bg-dangerRed" style="width: 67%;" title="파고: 3m"></div>
+                        </div>
+                        <p class="text-lightText/70 text-sm mt-2">최저 1m ~ 최대 3m (1/24, 1/27-28 높은 파고 주의)</p>
+                    </div>
+
+                    <!-- Infographic Card: 남해서부 (South Sea Western) -->
+                    <div class="bg-gradient-to-br from-lightBlue/15 to-primaryBlue/20 p-6 rounded-xl shadow-xl border border-primaryBlue/30 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                        <h3 class="text-xl md:text-2xl font-display font-semibold text-white mb-3">
+                            남해서부 (South Sea Western)
+                        </h3>
+                        <div class="flex items-center text-accentGreen text-lg mb-2">
+                            <span class="mr-2 text-2xl">🌧️❄️</span> <span>주말 흐리고 비/눈, 이후 대체로 흐림</span>
+                        </div>
+                        <p class="text-lightText/90 mb-3">
+                            <strong class="text-primaryBlue">예보 (1/24-30):</strong> 주말 흐리고 비/눈, 이후 대체로 흐림, 파고 1m-3m.
+                        </p>
+                        <div class="bg-primaryBlue/40 rounded-full h-2 flex overflow-hidden">
+                            <div class="bg-warningYellow" style="width: 33%;" title="파고: 1m"></div>
+                            <div class="bg-dangerRed" style="width: 67%;" title="파고: 3m"></div>
+                        </div>
+                        <p class="text-lightText/70 text-sm mt-2">최저 1m ~ 최대 3m (1/24, 1/27-28 높은 파고 주의)</p>
+                    </div>
+
+                    <!-- Infographic Card: 남해동부 (South Sea Eastern) -->
+                    <div class="bg-gradient-to-br from-lightBlue/15 to-primaryBlue/20 p-6 rounded-xl shadow-xl border border-primaryBlue/30 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                        <h3 class="text-xl md:text-2xl font-display font-semibold text-white mb-3">
+                            남해동부 (South Sea Eastern)
+                        </h3>
+                        <div class="flex items-center text-accentGreen text-lg mb-2">
+                            <span class="mr-2 text-2xl">☁️☔</span> <span>대체로 흐림, 월/화 비 가능성</span>
+                        </div>
+                        <p class="text-lightText/90 mb-3">
+                            <strong class="text-primaryBlue">예보 (1/24-30):</strong> 대체로 흐림, 1/26 오후 ~ 1/27 비, 파고 1m-3m.
+                        </p>
+                        <div class="bg-primaryBlue/40 rounded-full h-2 flex overflow-hidden">
+                            <div class="bg-warningYellow" style="width: 33%;" title="파고: 1m"></div>
+                            <div class="bg-dangerRed" style="width: 67%;" title="파고: 3m"></div>
+                        </div>
+                        <p class="text-lightText/70 text-sm mt-2">최저 1m ~ 최대 3m (1/24-25, 1/27-28 높은 파고 주의)</p>
+                    </div>
+
+                    <!-- Infographic Card: 제주도해상 (Jeju Island Waters) -->
+                    <div class="bg-gradient-to-br from-lightBlue/15 to-primaryBlue/20 p-6 rounded-xl shadow-xl border border-primaryBlue/30 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                        <h3 class="text-xl md:text-2xl font-display font-semibold text-white mb-3">
+                            제주도해상 (Jeju Island Waters)
+                        </h3>
+                        <div class="flex items-center text-accentGreen text-lg mb-2">
+                            <span class="mr-2 text-2xl">🌨️☔</span> <span>주말/월 오후 비/눈, 대체로 흐림</span>
+                        </div>
+                        <p class="text-lightText/90 mb-3">
+                            <strong class="text-primaryBlue">예보 (1/24-30):</strong> 주말/1/26 오후 비/눈, 대체로 흐림, 파고 1m-3m.
+                        </p>
+                        <div class="bg-primaryBlue/40 rounded-full h-2 flex overflow-hidden">
+                            <div class="bg-warningYellow" style="width: 33%;" title="파고: 1m"></div>
+                            <div class="bg-dangerRed" style="width: 67%;" title="파고: 3m"></div>
+                        </div>
+                        <p class="text-lightText/70 text-sm mt-2">최저 1m ~ 최대 3m (1/24, 1/26 오후 비/눈 주의)</p>
+                    </div>
+
+                    <!-- Infographic Card: 동해남부 (East Sea Southern) -->
+                    <div class="bg-gradient-to-br from-lightBlue/15 to-primaryBlue/20 p-6 rounded-xl shadow-xl border border-primaryBlue/30 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                        <h3 class="text-xl md:text-2xl font-display font-semibold text-white mb-3">
+                            동해남부 (East Sea Southern)
+                        </h3>
+                        <div class="flex items-center text-accentGreen text-lg mb-2">
+                            <span class="mr-2 text-2xl">❄️</span> <span>수요일까지 지속적인 눈</span>
+                        </div>
+                        <p class="text-lightText/90 mb-3">
+                            <strong class="text-primaryBlue">예보 (1/24-30):</strong> 1/28(수)까지 흐리고 눈, 파고 1m-4m.
+                        </p>
+                        <div class="bg-primaryBlue/40 rounded-full h-2 flex overflow-hidden">
+                            <div class="bg-warningYellow" style="width: 25%;" title="파고: 1m"></div>
+                            <div class="bg-dangerRed" style="width: 75%;" title="파고: 4m"></div>
+                        </div>
+                        <p class="text-lightText/70 text-sm mt-2">최저 1m ~ 최대 4m (1/24-25 매우 높은 파고/눈 주의)</p>
+                    </div>
+                    
+                    <!-- Infographic Card: 동해중부 (East Sea Central) -->
+                    <div class="bg-gradient-to-br from-lightBlue/15 to-primaryBlue/20 p-6 rounded-xl shadow-xl border border-primaryBlue/30 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                        <h3 class="text-xl md:text-2xl font-display font-semibold text-white mb-3">
+                            동해중부 (East Sea Central)
+                        </h3>
+                        <div class="flex items-center text-accentGreen text-lg mb-2">
+                            <span class="mr-2 text-2xl">🌨️</span> <span>잦은 눈과 흐린 날씨</span>
+                        </div>
+                        <p class="text-lightText/90 mb-3">
+                            <strong class="text-primaryBlue">예보 (1/24-30):</strong> 잦은 눈과 흐림, 파고 1m-4m (가끔 맑음).
+                        </p>
+                        <div class="bg-primaryBlue/40 rounded-full h-2 flex overflow-hidden">
+                            <div class="bg-warningYellow" style="width: 25%;" title="파고: 1m"></div>
+                            <div class="bg-dangerRed" style="width: 75%;" title="파고: 4m"></div>
+                        </div>
+                        <p class="text-lightText/70 text-sm mt-2">최저 1m ~ 최대 4m (1/24-25, 1/27-29 높은 파고/눈 주의)</p>
+                    </div>
+
+                    <!-- Infographic Card: 서해북부 (West Sea Northern) -->
+                    <div class="bg-gradient-to-br from-lightBlue/15 to-primaryBlue/20 p-6 rounded-xl shadow-xl border border-primaryBlue/30 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                        <h3 class="text-xl md:text-2xl font-display font-semibold text-white mb-3">
+                            서해북부 (West Sea Northern)
+                        </h3>
+                        <div class="flex items-center text-accentGreen text-lg mb-2">
+                            <span class="mr-2 text-2xl">☀️🌤️</span> <span>대체로 맑음 ~ 흐림</span>
+                        </div>
+                        <p class="text-lightText/90 mb-3">
+                            <strong class="text-primaryBlue">예보 (1/24-30):</strong> 대체로 맑거나 흐림, 파고 0.5m-2.5m.
+                        </p>
+                        <div class="bg-primaryBlue/40 rounded-full h-2 flex overflow-hidden">
+                            <div class="bg-accentGreen" style="width: 20%;" title="파고: 0.5m"></div>
+                            <div class="bg-warningYellow" style="width: 50%;" title="파고: 1.5m"></div>
+                            <div class="bg-dangerRed" style="width: 30%;" title="파고: 2.5m"></div>
+                        </div>
+                        <p class="text-lightText/70 text-sm mt-2">최저 0.5m ~ 최대 2.5m (1/24 오후 높은 파고 주의)</p>
+                    </div>
+                    
+                    <!-- Infographic Card: 동해북부 (East Sea Northern) -->
+                    <div class="bg-gradient-to-br from-lightBlue/15 to-primaryBlue/20 p-6 rounded-xl shadow-xl border border-primaryBlue/30 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                        <h3 class="text-xl md:text-2xl font-display font-semibold text-white mb-3">
+                            동해북부 (East Sea Northern)
+                        </h3>
+                        <div class="flex items-center text-accentGreen text-lg mb-2">
+                            <span class="mr-2 text-2xl">❄️</span> <span>주말, 월 오후, 화 오전 눈</span>
+                        </div>
+                        <p class="text-lightText/90 mb-3">
+                            <strong class="text-primaryBlue">예보 (1/24-30):</strong> 주말, 1/26 오후, 1/27 오전 눈, 파고 1m-4m.
+                        </p>
+                        <div class="bg-primaryBlue/40 rounded-full h-2 flex overflow-hidden">
+                            <div class="bg-warningYellow" style="width: 25%;" title="파고: 1m"></div>
+                            <div class="bg-dangerRed" style="width: 75%;" title="파고: 4m"></div>
+                        </div>
+                        <p class="text-lightText/70 text-sm mt-2">최저 1m ~ 최대 4m (1/24-25, 1/27-29 높은 파고/눈 주의)</p>
+                    </div>
+                    
+                    <!-- Infographic Card: 규슈 (Kyushu Waters) -->
+                    <div class="bg-gradient-to-br from-lightBlue/15 to-primaryBlue/20 p-6 rounded-xl shadow-xl border border-primaryBlue/30 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                        <h3 class="text-xl md:text-2xl font-display font-semibold text-white mb-3">
+                            규슈 해상 (Kyushu Waters)
+                        </h3>
+                        <div class="flex items-center text-accentGreen text-lg mb-2">
+                            <span class="mr-2 text-2xl">☔☁️</span> <span>주말/월 오후 비, 대체로 흐림</span>
+                        </div>
+                        <p class="text-lightText/90 mb-3">
+                            <strong class="text-primaryBlue">예보 (1/24-30):</strong> 주말/1/26 오후 비, 대체로 흐림, 파고 1m-3m.
+                        </p>
+                        <div class="bg-primaryBlue/40 rounded-full h-2 flex overflow-hidden">
+                            <div class="bg-warningYellow" style="width: 33%;" title="파고: 1m"></div>
+                            <div class="bg-dangerRed" style="width: 67%;" title="파고: 3m"></div>
+                        </div>
+                        <p class="text-lightText/70 text-sm mt-2">최저 1m ~ 최대 3m (1/24, 1/26 비/파고 주의)</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function toggleAccordion(element) {
+            const content = element.querySelector('.accordion-content');
+            const icon = element.querySelector('span:last-child'); // The '+' icon
+            
+            // Close all other active accordions
+            document.querySelectorAll('.accordion-content.active').forEach(item => {
+                if (item !== content) {
+                    item.classList.remove('active');
+                    item.closest('.group').querySelector('span:last-child').classList.remove('rotate-180');
+                }
+            });
+
+            content.classList.toggle('active');
+            icon.classList.toggle('rotate-180');
+        }
+
+        // Initialize accordion state on load (optional, useful if any are open by default)
+        document.addEventListener('DOMContentLoaded', () => {
+            // No accordions are open by default. If we wanted, we could open the first one.
+            // document.querySelector('.accordion-item:first-child').click();
+        });
+    </script>
+</body>
+</html>
