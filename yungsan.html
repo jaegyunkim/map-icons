@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영산강 CCTV 실시간 뷰어</title>
+    
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    
+    <!-- Tailwind CSS (스타일링용) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 폰트: Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        /* Video.js 커스텀 스타일 */
+        .video-js .vjs-big-play-button {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            line-height: 76px;
+        }
+        .vjs-matrix .vjs-big-play-button { /* 테마 스타일 오버라이드 */
+            border-radius: 50%;
+        }
+        
+        /* 로딩 스피너 등 추가 스타일 */
+        .status-badge {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+
+    <!-- 상단 헤더 및 컨트롤 영역 -->
+    <header class="bg-gray-900 border-b border-gray-700 p-4 shadow-lg z-10">
+        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="text-red-500 text-2xl">●</span>
+                <h1 class="text-xl font-bold tracking-wider">영산강 CCTV <span class="text-gray-400 text-sm font-normal">Live Viewer</span></h1>
+            </div>
+            
+            <div class="w-full md:w-auto flex items-center gap-3 bg-gray-800 p-1.5 rounded-lg border border-gray-600">
+                <label for="locationSelect" class="pl-2 text-sm text-gray-300 font-medium whitespace-nowrap">📷 장소 선택:</label>
+                <select id="locationSelect" class="bg-gray-700 text-white text-sm rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64 border-none cursor-pointer hover:bg-gray-600 transition-colors">
+                    <option value="" disabled selected>장소를 선택하세요</option>
+                    <!-- 자바스크립트로 옵션이 채워집니다 -->
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 비디오 영역 -->
+    <main class="flex-grow relative bg-black flex items-center justify-center p-4">
+        <div class="relative w-full max-w-5xl aspect-video bg-gray-900 rounded-xl overflow-hidden shadow-2xl border border-gray-800">
+            
+            <!-- 비디오 플레이어 -->
+            <video id="my_video" class="video-js vjs-default-skin vjs-fluid" controls preload="auto" poster="">
+                <p class="vjs-no-js">
+                    이 비디오를 보려면 JavaScript를 활성화하고 HTML5 비디오를 지원하는 웹 브라우저로 업그레이드하세요.
+                </p>
+            </video>
+
+            <!-- 오버레이 정보 (타이틀 및 상태) -->
+            <div class="absolute top-4 left-4 right-4 flex justify-between items-start pointer-events-none z-10">
+                <div class="bg-black/60 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/10">
+                    <h2 id="cctv_title" class="text-lg font-bold text-white drop-shadow-md">CCTV를 선택해주세요</h2>
+                    <div id="status_msg" class="text-xs text-gray-400 mt-1 font-mono">준비됨</div>
+                </div>
+                <div class="status-badge hidden bg-red-600/80 text-white text-xs font-bold px-2 py-1 rounded animate-pulse shadow-lg backdrop-blur-md">
+                    LIVE
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="bg-gray-900 text-gray-500 text-xs py-2 text-center border-t border-gray-800">
+        <p>본 CCTV 영상은 낙동강홍수통제소에서 제공하는 공개 데이터입니다. 네트워크 상태에 따라 재생이 지연될 수 있습니다.</p>
+    </footer>
+
+    <!-- 라이브러리 로드 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+
+    <script>
+        // --- 1. CCTV 데이터 소스 정의 ---
+        const cctv_sources = [
+            { name: "광주광역시 극락교", url: "https://cctvlo.yeongsanriver.go.kr/live/cctv13003/hls.m3u8" },
+            { name: "광주광역시 벽진동", url: "https://cctvlo.yeongsanriver.go.kr/live/cctv13050/hls.m3u8" },
+            { name: "광주광역시 신운교", url: "https://cctvlo.yeongsanriver.go.kr/live/cctv13074/hls.m3u8" },
+            { name: "광주광역시 용산교", url: "https://cctvlo.yeongsanriver.go.kr/live/cctv110014/hls.m3u8" },
+            { name: "광주광역시 용진교", url: "https://cctvlo.yeongsanriver.go.kr/live/cctv110016/hls.m3u8" },
+            { name: "광주광역시 유촌교", url: "https://cctvlo.yeongsanriver.go.kr/live/cctv13004/hls.m3u8" },
+            { name: "광주광역시 장록교", url: "https://cctvlo.yeongsanriver.go.kr/live/cctv13000/hls.m3u8" },
+            { name: "광주광역시 천교", url: "https://cctvlo.yeongsanriver.go.kr/live/cctv13076/hls.m3u8" },
+            { name: "광주광역시 평림교", url: "https://cctvlo.yeongsanriver.go.kr/live/cctv110020/hls.m3u8" },
+            { name: "광주광역시 풍영정천2교", url: "https://cctvlo.yeongsanriver.go.kr/live/cctv110022/hls.m3u8" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dropdown 옵션 채우기
+            const selectElement = document.getElementById('locationSelect');
+            cctv_sources.forEach((source, index) => {
+                const option = document.createElement('option');
+                option.value = index; // 인덱스를 값으로 사용
+                option.textContent = source.name;
+                selectElement.appendChild(option);
+            });
+
+            // Video.js 초기화
+            const player = videojs('my_video', {
+                fluid: true, // 반응형 크기 조절
+                controlBar: {
+                    children: [
+                        'playToggle',
+                        'volumePanel',
+                        'progressControl', // 라이브 스트림이라 큰 의미는 없지만 버퍼 확인용
+                        'fullscreenToggle',
+                    ]
+                }
+            });
+
+            const titleEl = document.getElementById('cctv_title');
+            const statusEl = document.getElementById('status_msg');
+            const liveBadge = document.querySelector('.status-badge');
+
+            // 플레이어 에러 핸들링
+            player.on('error', function() {
+                const error = player.error();
+                console.error("Video Error:", error);
+                titleEl.classList.add('text-red-400');
+                statusEl.textContent = `오류 발생: ${error.message || "연결 실패"}`;
+                statusEl.className = "text-xs text-red-400 mt-1 font-mono";
+                liveBadge.classList.add('hidden');
+            });
+
+            player.on('playing', function() {
+                statusEl.textContent = "● 실시간 재생 중";
+                statusEl.className = "text-xs text-green-400 mt-1 font-mono";
+                liveBadge.classList.remove('hidden');
+            });
+            
+            player.on('waiting', function() {
+                statusEl.textContent = "버퍼링 중...";
+                statusEl.className = "text-xs text-yellow-400 mt-1 font-mono";
+            });
+
+            // 소스 변경 함수
+            window.changeCCTVSource = function(index) {
+                const source = cctv_sources[index];
+                if (!source) return;
+
+                // UI 업데이트
+                titleEl.textContent = source.name;
+                titleEl.classList.remove('text-red-400');
+                statusEl.textContent = "연결 시도 중...";
+                statusEl.className = "text-xs text-yellow-400 mt-1 font-mono";
+                liveBadge.classList.add('hidden');
+
+                // 플레이어 소스 설정
+                player.ready(function() {
+                    player.src({
+                        src: source.url,
+                        type: 'application/x-mpegURL' // HLS 타입 지정
+                    });
+
+                    // 재생 시도
+                    const playPromise = player.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise
+                        .then(() => {
+                            // 재생 시작됨 (playing 이벤트에서 UI 업데이트)
+                        })
+                        .catch(error => {
+                            console.warn("Autoplay prevented:", error);
+                            if (error.name === 'NotAllowedError') {
+                                statusEl.textContent = "▶ 재생 버튼을 눌러주세요 (자동재생 차단됨)";
+                                statusEl.className = "text-xs text-orange-400 mt-1 font-mono";
+                            } else {
+                                statusEl.textContent = "재생 실패 (네트워크/보안 문제 가능성)";
+                                statusEl.className = "text-xs text-red-400 mt-1 font-mono";
+                            }
+                        });
+                    }
+                });
+            };
+
+            // 드롭다운 변경 이벤트
+            selectElement.addEventListener('change', function(e) {
+                changeCCTVSource(e.target.value);
+            });
+
+            // (선택 사항) 페이지 로드 시 첫 번째 CCTV 자동 로드 원하면 아래 주석 해제
+            // selectElement.value = "0";
+            // changeCCTVSource(0);
+        });
+    </script>
+</body>
+</html>
