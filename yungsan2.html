@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 중요: 스트리밍 서버가 외부 접속을 차단할 때, 참조자 정보를 숨겨서 접속을 시도하는 설정 -->
+    <meta name="referrer" content="no-referrer">
+    <title>영산강 CCTV 통합 뷰어</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Hls.js (직접 재생용 라이브러리) -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <!-- 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #111827; color: white; }
+        
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        /* Iframe 컨테이너: 원본 사이트의 상단/하단을 가리기 위한 클리핑 기법 (선택사항) */
+        .iframe-container {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            background-color: black;
+        }
+        
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* 활성화된 버튼 스타일 */
+        .btn-active {
+            background-color: #2563eb; /* blue-600 */
+            border-color: #2563eb;
+            color: white;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+
+    <!-- 헤더 -->
+    <header class="bg-gray-900 border-b border-gray-700 p-4 shadow-lg z-20">
+        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="flex h-3 w-3 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+                <h1 class="text-xl font-bold tracking-wide">영산강 CCTV 통합 뷰어</h1>
+            </div>
+
+            <!-- 재생 모드 선택 -->
+            <div class="flex bg-gray-800 rounded-lg p-1 border border-gray-600">
+                <button onclick="setMode('iframe')" id="btn-iframe" class="px-4 py-1.5 text-sm rounded transition-colors btn-active text-gray-300">
+                    웹페이지 모드 (안정적)
+                </button>
+                <button onclick="setMode('direct')" id="btn-direct" class="px-4 py-1.5 text-sm rounded transition-colors hover:bg-gray-700 text-gray-300">
+                    직접 재생 모드 (빠름)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-grow overflow-hidden">
+        <!-- 사이드바: 목록 -->
+        <aside class="w-64 bg-gray-800 flex flex-col border-r border-gray-700 hidden md:flex">
+            <div class="p-4 border-b border-gray-700 bg-gray-850">
+                <h2 class="text-sm font-semibold text-gray-400">관측소 목록</h2>
+            </div>
+            <div class="flex-grow overflow-y-auto p-2 space-y-1" id="cctv-list">
+                <!-- 자바스크립트로 목록 생성 -->
+            </div>
+        </aside>
+
+        <!-- 메인 화면 -->
+        <main class="flex-grow flex flex-col relative bg-black">
+            <!-- 모바일용 드롭다운 (md 이하에서만 보임) -->
+            <div class="md:hidden p-2 bg-gray-800 border-b border-gray-700">
+                <select id="mobile-select" class="w-full bg-gray-700 text-white rounded p-2 border border-gray-600" onchange="changeCCTV(this.value)">
+                    <!-- 옵션 생성됨 -->
+                </select>
+            </div>
+
+            <div class="flex-grow relative w-full h-full flex items-center justify-center">
+                
+                <!-- 모드 1: Iframe (웹페이지 임베드) -->
+                <div id="view-iframe" class="w-full h-full iframe-container">
+                    <iframe id="main-iframe" src="" allowfullscreen></iframe>
+                    <!-- 로딩 가림막 -->
+                    <div id="iframe-loader" class="absolute inset-0 bg-gray-900 flex flex-col items-center justify-center text-gray-400 z-10 hidden">
+                        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-2"></div>
+                        <p>공공 데이터 포털 접속 중...</p>
+                    </div>
+                </div>
+
+                <!-- 모드 2: Direct Video (HLS 직접 재생) -->
+                <div id="view-direct" class="w-full max-w-5xl aspect-video hidden bg-black shadow-2xl relative">
+                    <video id="video-player" class="w-full h-full object-contain" controls autoplay muted></video>
+                    <div class="absolute top-4 left-4 bg-black/50 px-3 py-1 rounded text-xs text-gray-300 pointer-events-none">
+                        HLS Direct Stream
+                    </div>
+                </div>
+
+                <!-- 안내 메시지 -->
+                <div id="welcome-msg" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 z-30">
+                    <div class="text-center p-6 max-w-md">
+                        <svg class="w-16 h-16 text-blue-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        &nbsp;
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 현재 재생 정보 푸터 -->
+            <div class="bg-gray-900 p-3 border-t border-gray-800 flex justify-between items-center text-xs text-gray-500">
+                <span id="current-info">선택된 CCTV 없음</span>
+                <span>Data: 영산강홍수통제소</span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // CCTV 데이터 (ID는 URL 파라미터와 매칭)
+        const cctvList = [
+            { id: "13003", name: "광주광역시 극락교" },
+            { id: "13050", name: "광주광역시 벽진동" },
+            { id: "13074", name: "광주광역시 신운교" },
+            { id: "110014", name: "광주광역시 용산교" },
+            { id: "110016", name: "광주광역시 용진교" },
+            { id: "13004", name: "광주광역시 유촌교" },
+            { id: "13000", name: "광주광역시 장록교" },
+            { id: "13076", name: "광주광역시 천교" },
+            { id: "110020", name: "광주광역시 평림교" },
+            { id: "110022", name: "광주광역시 풍영정천2교" }
+        ];
+
+        let currentMode = 'iframe'; // iframe 또는 direct
+        let currentId = null;
+        let hls = null;
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            renderList();
+        });
+
+        // 목록 렌더링
+        function renderList() {
+            const listContainer = document.getElementById('cctv-list');
+            const mobileSelect = document.getElementById('mobile-select');
+
+            // 모바일용 기본 옵션
+            const defaultOption = document.createElement('option');
+            defaultOption.text = "관측소를 선택하세요";
+            defaultOption.value = "";
+            mobileSelect.appendChild(defaultOption);
+
+            cctvList.forEach(cctv => {
+                // 사이드바 버튼 생성
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-4 py-3 text-sm hover:bg-gray-700 border-l-4 border-transparent transition-all flex items-center justify-between group cctv-item`;
+                btn.dataset.id = cctv.id;
+                btn.innerHTML = `
+                    <span>${cctv.name}</span>
+                    <span class="text-gray-500 text-xs group-hover:text-white transition-colors">LIVE</span>
+                `;
+                btn.onclick = () => changeCCTV(cctv.id);
+                listContainer.appendChild(btn);
+
+                // 모바일 셀렉트 옵션 생성
+                const option = document.createElement('option');
+                option.value = cctv.id;
+                option.text = cctv.name;
+                mobileSelect.appendChild(option);
+            });
+        }
+
+        // 모드 변경 (Iframe <-> Direct)
+        window.setMode = function(mode) {
+            currentMode = mode;
+            
+            // 버튼 스타일 업데이트
+            document.getElementById('btn-iframe').className = mode === 'iframe' 
+                ? "px-4 py-1.5 text-sm rounded transition-colors btn-active text-white font-bold shadow-md" 
+                : "px-4 py-1.5 text-sm rounded transition-colors hover:bg-gray-700 text-gray-400";
+            
+            document.getElementById('btn-direct').className = mode === 'direct' 
+                ? "px-4 py-1.5 text-sm rounded transition-colors btn-active text-white font-bold shadow-md" 
+                : "px-4 py-1.5 text-sm rounded transition-colors hover:bg-gray-700 text-gray-400";
+
+            // 뷰어 전환
+            const viewIframe = document.getElementById('view-iframe');
+            const viewDirect = document.getElementById('view-direct');
+
+            if (mode === 'iframe') {
+                viewIframe.classList.remove('hidden');
+                viewDirect.classList.add('hidden');
+                // HLS 정리
+                if(hls) { hls.destroy(); hls = null; }
+                const video = document.getElementById('video-player');
+                video.pause();
+            } else {
+                viewIframe.classList.add('hidden');
+                viewDirect.classList.remove('hidden');
+                // Iframe 정리 (리소스 절약)
+                document.getElementById('main-iframe').src = "about:blank";
+            }
+
+            // 현재 선택된 CCTV가 있다면 다시 로드
+            if (currentId) {
+                loadCCTV(currentId);
+            }
+        }
+
+        // CCTV 변경 처리
+        window.changeCCTV = function(id) {
+            if (!id) return;
+            currentId = id;
+
+            // 웰컴 메시지 숨김
+            document.getElementById('welcome-msg').classList.add('hidden');
+
+            // 사이드바 활성 상태 표시
+            document.querySelectorAll('.cctv-item').forEach(btn => {
+                if (btn.dataset.id === id) {
+                    btn.classList.add('bg-gray-700', 'border-blue-500', 'text-white');
+                    btn.classList.remove('border-transparent', 'text-gray-400');
+                } else {
+                    btn.classList.remove('bg-gray-700', 'border-blue-500', 'text-white');
+                    btn.classList.add('border-transparent', 'text-gray-400');
+                }
+            });
+
+            // 하단 정보 업데이트
+            const target = cctvList.find(c => c.id === id);
+            if (target) {
+                document.getElementById('current-info').textContent = `재생 중: ${target.name} (${currentMode === 'iframe' ? '웹 모드' : '직접 스트리밍'})`;
+            }
+
+            loadCCTV(id);
+        }
+
+        // 실제 영상 로드 로직
+        function loadCCTV(id) {
+            if (currentMode === 'iframe') {
+                loadIframe(id);
+            } else {
+                loadDirectStream(id);
+            }
+        }
+
+        // 1. Iframe 모드 (원본 페이지 임베드)
+        function loadIframe(id) {
+            const iframe = document.getElementById('main-iframe');
+            const loader = document.getElementById('iframe-loader');
+            
+            // 로더 표시
+            loader.classList.remove('hidden');
+            
+            // 원본 페이지 URL (1번 링크 패턴)
+            const url = `https://www.yeongsanriver.go.kr/sumun/videoDetail.do?wlobscd=${id}`;
+            
+            iframe.onload = () => {
+                loader.classList.add('hidden');
+            };
+            iframe.src = url;
+        }
+
+        // 2. Direct 모드 (HLS 직접 재생 시도)
+        function loadDirectStream(id) {
+            const video = document.getElementById('video-player');
+            // 스트림 URL (2번 링크 패턴)
+            // 참고: ID 매핑 (목록에 따라 주소 패턴이 조금씩 다를 수 있으나, 제공해주신 코드를 기반으로 매핑)
+            // CCTV ID가 곧 URL의 cctvXXXXXX 부분에 쓰인다고 가정 (110014 등은 자리수가 다름을 주의)
+            const streamUrl = `https://cctvlo.yeongsanriver.go.kr/live/cctv${id}/hls.m3u8`;
+
+            if (Hls.isSupported()) {
+                if(hls) {
+                    hls.destroy();
+                }
+                hls = new Hls({
+                    // CORS 문제 완화를 위한 설정 시도 (서버가 허용해야만 작동)
+                    xhrSetup: function(xhr, url) {
+                        xhr.withCredentials = false; // 자격 증명 전송 안 함
+                    }
+                });
+                
+                hls.loadSource(streamUrl);
+                hls.attachMedia(video);
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play().catch(e => console.log("자동 재생 차단됨: 사용자 클릭 필요"));
+                });
+                
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        alert("직접 재생에 실패했습니다. (보안 차단)\n상단의 [웹페이지 모드]를 이용해주세요.");
+                        console.error("HLS Error:", data);
+                        setMode('iframe'); // 실패 시 자동으로 iframe 모드로 전환
+                    }
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                // 사파리 등 네이티브 HLS 지원 브라우저
+                video.src = streamUrl;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play();
+                });
+            }
+        }
+    </script>
+</body>
+</html>
