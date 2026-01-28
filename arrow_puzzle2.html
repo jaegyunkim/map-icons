@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>오늘의책 - 화살표 퍼즐</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    
+    <!-- Babel (for JSX) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* Global Styles & Animations */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent pull-to-refresh on mobile */
+        }
+
+        @keyframes shake {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-4px, 0); }
+            40% { transform: translate(4px, 0); }
+            60% { transform: translate(-4px, 0); }
+            80% { transform: translate(4px, 0); }
+            100% { transform: translate(0, 0); }
+        }
+        .shake {
+            animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+            color: #ef4444 !important;
+            border-color: #ef4444 !important;
+        }
+
+        @keyframes flyUp { to { transform: translateY(-100vh); opacity: 0; } }
+        @keyframes flyDown { to { transform: translateY(100vh); opacity: 0; } }
+        @keyframes flyLeft { to { transform: translateX(-100vw); opacity: 0; } }
+        @keyframes flyRight { to { transform: translateX(100vw); opacity: 0; } }
+
+        .fly-UP { animation: flyUp 0.6s ease-in forwards; pointer-events: none; }
+        .fly-DOWN { animation: flyDown 0.6s ease-in forwards; pointer-events: none; }
+        .fly-LEFT { animation: flyLeft 0.6s ease-in forwards; pointer-events: none; }
+        .fly-RIGHT { animation: flyRight 0.6s ease-in forwards; pointer-events: none; }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+
+        // --- Constants & Config ---
+        const GRID_SIZE = 6;
+        const DIRECTIONS = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
+
+        const backgroundImages = [
+            "https://jaegyunkim.github.io/map-icons/arrow_puzzle1.PNG",
+            "https://jaegyunkim.github.io/map-icons/arrow_puzzle2.PNG",
+            "https://jaegyunkim.github.io/map-icons/arrow_puzzle3.PNG",
+            "https://jaegyunkim.github.io/map-icons/arrow_puzzle4.PNG",
+            "https://jaegyunkim.github.io/map-icons/arrow_puzzle5.PNG"
+        ];
+
+        // --- Icons ---
+        const Icons = {
+            ArrowLeft: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
+            Refresh: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"/></svg>,
+            Back: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>,
+            Hint: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>,
+        };
+
+        // --- Logic Functions ---
+        const checkPathLogic = (grid, r, c, dir) => {
+            if (!grid || !grid[r]) return false;
+
+            let dr = 0, dc = 0;
+            if (dir === 'UP') dr = -1;
+            if (dir === 'DOWN') dr = 1;
+            if (dir === 'LEFT') dc = -1;
+            if (dir === 'RIGHT') dc = 1;
+
+            let currR = r + dr;
+            let currC = c + dc;
+
+            while (currR >= 0 && currR < GRID_SIZE && currC >= 0 && currC < GRID_SIZE) {
+                if (grid[currR] && grid[currR][currC] && grid[currR][currC].status === 'ACTIVE') {
+                    return false; // Blocked
+                }
+                currR += dr;
+                currC += dc;
+            }
+            return true; // Clear path
+        };
+
+        const isSolvable = (initialGrid) => {
+            if (!initialGrid) return false;
+            
+            let simGrid = JSON.parse(JSON.stringify(initialGrid));
+            let changed = true;
+            
+            while(changed) {
+                changed = false;
+                const toRemove = [];
+
+                for(let r=0; r<GRID_SIZE; r++){
+                    for(let c=0; c<GRID_SIZE; c++){
+                        if (!simGrid[r]) continue;
+                        const b = simGrid[r][c];
+                        if(b && b.status === 'ACTIVE'){
+                            if(checkPathLogic(simGrid, r, c, b.direction)){
+                                toRemove.push({r,c});
+                            }
+                        }
+                    }
+                }
+
+                if(toRemove.length > 0) {
+                    toRemove.forEach(({r,c}) => {
+                        if (simGrid[r] && simGrid[r][c]) {
+                            simGrid[r][c].status = 'REMOVED';
+                        }
+                    });
+                    changed = true;
+                }
+            }
+
+            const remaining = simGrid.flat().filter(b => b && b.status === 'ACTIVE').length;
+            return remaining === 0;
+        };
+
+        // --- Main Component ---
+        function App() {
+            const [grid, setGrid] = useState([]);
+            const [gameState, setGameState] = useState('PLAYING'); // PLAYING, WON, FAILED
+            const [shakingId, setShakingId] = useState(null);
+            const [animatingIds, setAnimatingIds] = useState([]);
+            const [level, setLevel] = useState(1);
+            const [mistakes, setMistakes] = useState(0);
+            const [hintBlockId, setHintBlockId] = useState(null);
+            const [bgImage, setBgImage] = useState(backgroundImages[0]);
+
+            const generateLevel = useCallback(() => {
+                let validGrid = null;
+                let lastAttemptedGrid = null;
+                let attempts = 0;
+                const maxAttempts = 200;
+
+                while (!validGrid && attempts < maxAttempts) {
+                    let newGrid = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(null));
+                    const totalBlocks = Math.floor(GRID_SIZE * GRID_SIZE * 0.85);
+
+                    let coords = [];
+                    for(let r=0; r<GRID_SIZE; r++) {
+                        for(let c=0; c<GRID_SIZE; c++) {
+                            coords.push({r, c});
+                        }
+                    }
+                    coords.sort(() => Math.random() - 0.5);
+                    const activeCoords = coords.slice(0, totalBlocks);
+
+                    activeCoords.forEach(({r, c}) => {
+                        newGrid[r][c] = {
+                            id: `${r}-${c}-${Math.random()}`,
+                            direction: DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)],
+                            row: r,
+                            col: c,
+                            status: 'ACTIVE'
+                        };
+                    });
+
+                    lastAttemptedGrid = newGrid;
+
+                    if (isSolvable(newGrid)) {
+                        validGrid = newGrid;
+                    }
+                    attempts++;
+                }
+
+                if (!validGrid) {
+                    console.warn("Failed to generate solvable level. Using fallback.");
+                    validGrid = lastAttemptedGrid || Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(null));
+                }
+
+                setGrid(validGrid);
+                setGameState('PLAYING');
+                setAnimatingIds([]);
+                setMistakes(0);
+                setHintBlockId(null);
+                
+                const randomBg = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
+                setBgImage(randomBg);
+            }, []);
+
+            useEffect(() => {
+                generateLevel();
+            }, [generateLevel]);
+
+            const handleHint = () => {
+                if (gameState !== 'PLAYING') return;
+                if (!grid || grid.length === 0) return;
+
+                const validMoves = [];
+                for(let r=0; r<GRID_SIZE; r++) {
+                    for(let c=0; c<GRID_SIZE; c++) {
+                        if (!grid[r]) continue;
+                        const block = grid[r][c];
+                        if (block && block.status === 'ACTIVE') {
+                            if (checkPathLogic(grid, r, c, block.direction)) {
+                                validMoves.push(block);
+                            }
+                        }
+                    }
+                }
+
+                if (validMoves.length > 0) {
+                    const randomBlock = validMoves[Math.floor(Math.random() * validMoves.length)];
+                    setHintBlockId(randomBlock.id);
+                }
+            };
+
+            const handleBlockClick = (r, c) => {
+                if (gameState !== 'PLAYING') return;
+                if (!grid || !grid[r]) return;
+                
+                const block = grid[r][c];
+                if (!block || block.status !== 'ACTIVE') return;
+
+                if (checkPathLogic(grid, r, c, block.direction)) {
+                    const newGrid = [...grid.map(row => [...row])];
+                    newGrid[r][c] = { ...block, status: 'REMOVED' };
+                    setGrid(newGrid);
+                    
+                    setAnimatingIds(prev => [...prev, { id: block.id, direction: block.direction }]);
+                    setHintBlockId(null);
+
+                    const remaining = newGrid.flat().filter(b => b && b.status === 'ACTIVE').length;
+                    if (remaining === 0) {
+                        setTimeout(() => setGameState('WON'), 800);
+                    }
+                } else {
+                    setShakingId(block.id);
+                    setTimeout(() => setShakingId(null), 400);
+
+                    const newMistakes = mistakes + 1;
+                    setMistakes(newMistakes);
+
+                    if (newMistakes >= 10) {
+                        setGameState('FAILED');
+                    }
+                }
+            };
+
+            const getRotation = (dir) => {
+                switch(dir) {
+                    case 'UP': return 'rotate(-90deg)';
+                    case 'DOWN': return 'rotate(90deg)';
+                    case 'LEFT': return 'rotate(180deg)';
+                    case 'RIGHT': return 'rotate(0deg)';
+                    default: return 'rotate(0deg)';
+                }
+            };
+
+            const ArrowShape = ({ direction, isHint }) => {
+                return (
+                    <svg viewBox="0 0 24 24" fill="none" className={`w-8 h-8 md:w-10 md:h-10 transition-colors duration-300 ${isHint ? 'text-green-600' : 'text-slate-800'}`} style={{ transform: getRotation(direction) }}>
+                        <path d="M4 12H16" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                        <path d="M14 6L20 12L14 18" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                );
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden select-none touch-none font-sans bg-white">
+                    {/* Header */}
+                    <div className="w-full max-w-md relative flex justify-center items-center mb-8 px-4 py-4 bg-white rounded-2xl shadow-sm border border-slate-100 z-10">
+                        <div className="text-2xl sm:text-3xl font-extrabold text-blue-600 tracking-tight text-center">
+                            오늘의책
+                        </div>
+
+                        <div className="absolute right-4 flex gap-2">
+                            <button 
+                                onClick={handleHint} 
+                                className="p-2 rounded-full bg-slate-100 text-amber-500 hover:bg-slate-200 transition-colors"
+                                title="힌트"
+                            >
+                                <Icons.Hint />
+                            </button>
+                            <button 
+                                onClick={generateLevel} 
+                                className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                                title="새 게임"
+                            >
+                                <Icons.Refresh />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Game Grid Box */}
+                    <div 
+                        className="relative p-2 rounded-2xl shadow-2xl border border-slate-200 z-10 transition-all duration-700 ease-in-out"
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
+                            gap: '8px',
+                            width: 'min(90vw, 400px)',
+                            height: 'min(90vw, 400px)',
+                            backgroundImage: `url(${bgImage})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                        }}
+                    >
+                        {/* Overlay */}
+                        <div className="absolute inset-0 bg-white/20 rounded-2xl pointer-events-none"></div>
+
+                        {grid && grid.length > 0 && grid.map((row, r) => 
+                            row.map((block, c) => {
+                                const animating = animatingIds.find(a => a.id === block?.id);
+                                const shaking = shakingId === block?.id;
+                                const isHint = hintBlockId === block?.id;
+
+                                if (!block && !animating) return <div key={`empty-${r}-${c}`} />;
+
+                                let renderBlock = block;
+                                let animClass = '';
+
+                                if (animating) {
+                                    renderBlock = { id: animating.id, direction: animating.direction };
+                                    animClass = `fly-${animating.direction}`;
+                                } else if (block?.status === 'REMOVED') {
+                                    return <div key={`removed-${r}-${c}`} />;
+                                }
+
+                                if (!renderBlock) return <div key={`empty-${r}-${c}`} />;
+
+                                return (
+                                    <div
+                                        key={renderBlock.id}
+                                        onClick={() => handleBlockClick(r, c)}
+                                        className={`
+                                            relative flex items-center justify-center
+                                            bg-white rounded-xl cursor-pointer
+                                            shadow-[0_2px_0_0_rgba(30,41,59,1)] active:shadow-none active:translate-y-[2px]
+                                            border-2
+                                            transition-all duration-300
+                                            ${shaking ? 'shake' : ''}
+                                            ${isHint ? 'border-green-500 shadow-green-200 ring-2 ring-green-200' : 'border-slate-800'}
+                                            ${animClass}
+                                        `}
+                                        style={{ zIndex: animating ? 50 : 10 }}
+                                    >
+                                        <ArrowShape direction={renderBlock.direction} isHint={isHint} />
+                                    </div>
+                                );
+                            })
+                        )}
+                    </div>
+                    
+                    {/* Level Indicator */}
+                    <div className="mt-8 px-6 py-2 bg-slate-100 rounded-full shadow-sm z-10 text-slate-800 font-bold tracking-widest text-sm">
+                        LEVEL {level}
+                    </div>
+
+                    {/* Modals */}
+                    {gameState !== 'PLAYING' && (
+                        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in">
+                            <div className="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-xs w-full transform scale-100 transition-all">
+                                {gameState === 'WON' ? (
+                                    <>
+                                        <div className="text-5xl mb-4">🎉</div>
+                                        <h2 className="text-2xl font-bold text-slate-800 mb-2">성공!</h2>
+                                        <button
+                                            onClick={() => window.open('https://m.blog.naver.com/thedailypick', '_blank')}
+                                            className="text-blue-500 mb-6 underline hover:text-blue-600 transition-colors font-semibold"
+                                        >
+                                            더 많은 추천책 보기
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                setLevel(l => l + 1);
+                                                generateLevel();
+                                            }}
+                                            className="w-full py-3 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-700 transition-colors shadow-lg active:scale-95"
+                                        >
+                                            다음 레벨
+                                        </button>
+                                    </>
+                                ) : gameState === 'FAILED' ? (
+                                    <>
+                                        <div className="text-5xl mb-4">⚠️</div>
+                                        <h2 className="text-xl font-bold text-slate-800 mb-4">앗! 실수가 많네요</h2>
+                                        <button 
+                                            onClick={() => window.open('https://m.blog.naver.com/thedailypick', '_blank')}
+                                            className="w-full py-3 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600 transition-colors shadow-lg active:scale-95 mb-3 text-sm"
+                                        >
+                                            더 많은 추천책 보기
+                                        </button>
+                                        <button 
+                                            onClick={generateLevel}
+                                            className="text-slate-400 text-sm hover:text-slate-600 underline"
+                                        >
+                                            다시 시작하기
+                                        </button>
+                                    </>
+                                ) : null}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
