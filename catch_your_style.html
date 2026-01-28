@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>캐치 유어 스타일 - 나만의 낚시 성향 찾기</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f9ff;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23bae6fd' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .wave-text {
+            background: linear-gradient(to right, #0ea5e9, #2563eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card-enter {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+        .loading-fish {
+            animation: swim 2s infinite ease-in-out;
+        }
+        @keyframes swim {
+            0%, 100% { transform: translateX(-10px) rotate(0deg); }
+            50% { transform: translateX(10px) rotate(5deg); }
+        }
+        /* Modal Animation */
+        .modal-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-slide-up {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- App Container -->
+    <div id="app" class="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden relative min-h-[600px] flex flex-col">
+        
+        <!-- Header -->
+        <header class="p-6 bg-white z-10 text-center border-b border-sky-100">
+            <h1 class="text-xl font-bold tracking-tight text-slate-800">
+                <i class="fa-solid fa-fish text-sky-500 mr-2"></i>캐치 유어 스타일
+            </h1>
+        </header>
+
+        <!-- Dynamic Content Area -->
+        <main id="content" class="flex-1 flex flex-col items-center justify-center p-6 relative">
+            <!-- JavaScript will render screens here -->
+        </main>
+
+        <!-- Footer -->
+        <footer class="p-4 text-center text-xs text-slate-400 bg-slate-50">
+            &copy; 2026 Catch Your Style. All rights reserved.
+        </footer>
+    </div>
+
+    <!-- Share Modal (Hidden by default) -->
+    <div id="shareModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 modal-fade-in">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm modal-slide-up relative shadow-2xl">
+            <button onclick="closeShareModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <h3 class="text-xl font-bold text-slate-800 text-center mb-6">결과 공유하기</h3>
+            
+            <div class="space-y-3">
+                <!-- Instagram -->
+                <button onclick="shareTo('instagram')" class="w-full flex items-center justify-center gap-3 p-4 rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white font-bold hover:opacity-90 transition-opacity">
+                    <i class="fa-brands fa-instagram text-xl"></i> 인스타그램
+                </button>
+                
+                <!-- Facebook -->
+                <button onclick="shareTo('facebook')" class="w-full flex items-center justify-center gap-3 p-4 rounded-xl bg-[#1877F2] text-white font-bold hover:bg-blue-700 transition-colors">
+                    <i class="fa-brands fa-facebook text-xl"></i> 페이스북
+                </button>
+                
+                <!-- X (Twitter) -->
+                <button onclick="shareTo('x')" class="w-full flex items-center justify-center gap-3 p-4 rounded-xl bg-black text-white font-bold hover:bg-gray-800 transition-colors">
+                    <i class="fa-brands fa-x-twitter text-xl"></i> X (트위터)
+                </button>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 text-center">
+                 <button onclick="shareTo('copy')" class="text-slate-500 text-sm hover:text-sky-500 font-medium">
+                    <i class="fa-solid fa-link mr-1"></i> 링크 복사하기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA: Questions & Results ---
+
+        const questions = [
+            // E vs I (Energy Direction)
+            {
+                id: 1,
+                type: 'EI',
+                question: "주말 낚시, 어떤 스타일을 선호하시나요?",
+                answers: [
+                    { text: "친구들을 모아서 다 같이 왁자지껄하게 떠난다.", value: 'E' },
+                    { text: "조용히 혼자만의 시간을 즐기러 떠난다.", value: 'I' }
+                ]
+            },
+            {
+                id: 2,
+                type: 'EI',
+                question: "낚시터에 도착했습니다. 가장 먼저 하는 일은?",
+                answers: [
+                    { text: "옆 조사님께 '조황 어때요?'라고 말을 건다.", value: 'E' },
+                    { text: "사람이 없는 한적한 구석 자리를 탐색한다.", value: 'I' }
+                ]
+            },
+            {
+                id: 3,
+                type: 'EI',
+                question: "낚시 중 입질이 없을 때 나는?",
+                answers: [
+                    { text: "동료와 수다를 떨거나 간식을 먹으며 분위기를 푼다.", value: 'E' },
+                    { text: "채비를 점검하며 조용히 바다/강을 멍하니 바라본다.", value: 'I' }
+                ]
+            },
+            // S vs N (Perception)
+            {
+                id: 4,
+                type: 'SN',
+                question: "포인트를 선정할 때 중요하게 생각하는 것은?",
+                answers: [
+                    { text: "최근 조황 데이터와 물때표, 수온 등 팩트.", value: 'S' },
+                    { text: "왠지 대물이 나올 것 같은 '필(Feel)'과 분위기.", value: 'N' }
+                ]
+            },
+            {
+                id: 5,
+                type: 'SN',
+                question: "낚시 장비를 새로 살 때 나는?",
+                answers: [
+                    { text: "스펙, 무게, 소재 등 구체적인 성능을 꼼꼼히 따진다.", value: 'S' },
+                    { text: "디자인이 멋지거나, 혁신적인 신기술이 들어간 것에 끌린다.", value: 'N' }
+                ]
+            },
+            {
+                id: 6,
+                type: 'SN',
+                question: "물고기를 잡는 상상을 할 때?",
+                answers: [
+                    { text: "오늘 저녁 매운탕이나 회를 먹는 현실적인 상상.", value: 'S' },
+                    { text: "인생 고기를 낚아 전설이 되는 영웅적인 상상.", value: 'N' }
+                ]
+            },
+            // T vs F (Judgment)
+            {
+                id: 7,
+                type: 'TF',
+                question: "친구가 큰 물고기를 눈앞에서 놓쳤습니다. 당신의 반응은?",
+                answers: [
+                    { text: "\"줄이 너무 얇았나? 드랙을 좀 풀지 그랬어.\" (원인 분석)", value: 'T' },
+                    { text: "\"아이고!! 진짜 아깝다! 괜찮아?\" (감정 공감)", value: 'F' }
+                ]
+            },
+            {
+                id: 8,
+                type: 'TF',
+                question: "오늘의 낚시 성공 기준은 무엇인가요?",
+                answers: [
+                    { text: "대상어를 마릿수로 채우거나 목표 사이즈를 넘기는 것.", value: 'T' },
+                    { text: "함께 간 사람들과 즐거운 추억을 만들고 힐링하는 것.", value: 'F' }
+                ]
+            },
+            {
+                id: 9,
+                type: 'TF',
+                question: "낚시 방법을 배울 때 선호하는 방식은?",
+                answers: [
+                    { text: "논리적인 이론과 메커니즘을 이해해야 한다.", value: 'T' },
+                    { text: "고수나 선생님의 감각과 노하우를 전수받고 싶다.", value: 'F' }
+                ]
+            },
+            // J vs P (Lifestyle)
+            {
+                id: 10,
+                type: 'JP',
+                question: "낚시 여행 계획을 짤 때 나는?",
+                answers: [
+                    { text: "출조 시간, 포인트 이동 경로, 식사 메뉴까지 정해둔다.", value: 'J' },
+                    { text: "일단 물가로 가서 상황 봐서 결정한다.", value: 'P' }
+                ]
+            },
+            {
+                id: 11,
+                type: 'JP',
+                question: "낚시 중 갑자기 비가 쏟아진다면?",
+                answers: [
+                    { text: "미리 챙겨온 우의를 입거나, 플랜 B 포인트로 이동한다.", value: 'J' },
+                    { text: "비 맞으며 하는 수중전도 낭만이지! 그대로 즐긴다.", value: 'P' }
+                ]
+            },
+            {
+                id: 12,
+                type: 'JP',
+                question: "짐을 챙길 때 나는?",
+                answers: [
+                    { text: "필요한 채비와 소품을 체크리스트대로 완벽히 분류해 담는다.", value: 'J' },
+                    { text: "눈에 보이는 대로 일단 태클박스에 쓸어 담는다.", value: 'P' }
+                ]
+            }
+        ];
+
+        // Fishing Types Data (Updated with Image URLs)
+        const fishingTypes = {
+            "EGING": {
+                name: "에깅 (Eging)",
+                subtitle: "화려한 액션의 테크니션",
+                desc: "활동적이고 감각적인 당신! 갯바위나 방파제에서 끊임없이 액션(샤크리)을 주며 오징어를 유혹하는 에깅이 딱입니다. 지루할 틈이 없는 다이내믹한 낚시입니다.",
+                tags: ["#무늬오징어", "#갯바위", "#샤크리", "#액션"],
+                image: "https://jaegyunkim.github.io/map-icons/eging.png",
+                bg: "bg-purple-50"
+            },
+            "SURF": {
+                name: "원투 낚시 (Surf Casting)",
+                subtitle: "기다림과 여유의 낭만",
+                desc: "느긋하고 현실적인 당신. 채비를 멀리 던져두고 바다를 바라보며 입질을 기다리는 원투 낚시가 어울립니다. 캠핑과 낚시를 동시에 즐기기 가장 좋은 장르입니다.",
+                tags: ["#도다리", "#백사장", "#던질낚시", "#캠핑"],
+                image: "https://jaegyunkim.github.io/map-icons/surf.png",
+                bg: "bg-orange-50"
+            },
+            "FLOAT": {
+                name: "찌 낚시 (Float Fishing)",
+                subtitle: "바다를 읽는 전략가",
+                desc: "분석적이고 깊이 있는 당신. 조류와 수심을 계산하여 예민한 돔을 낚아내는 찌 낚시가 제격입니다. 머리싸움에서 이겼을 때의 쾌감은 최고입니다.",
+                tags: ["#감성돔", "#갯바위", "#수심공략", "#두뇌게임"],
+                image: "https://jaegyunkim.github.io/map-icons/float.png",
+                bg: "bg-red-50"
+            },
+            "SHORE": {
+                name: "쇼어 지깅 (Shore Jigging)",
+                subtitle: "파워풀한 에너지의 발산",
+                desc: "에너지가 넘치고 도전적인 당신! 무거운 메탈지그를 던지고 빠르게 감아들이며 회유성 어종과 힘 대결을 펼치는 쇼어 지깅이 당신의 야성을 깨워줄 것입니다.",
+                tags: ["#삼치/방어", "#파워게임", "#메탈지그", "#체력전"],
+                image: "https://jaegyunkim.github.io/map-icons/shore.png",
+                bg: "bg-blue-50"
+            },
+            "ROCKFISH": {
+                name: "볼락 루어 (Rockfish Lure)",
+                subtitle: "밤바다의 섬세한 예술가",
+                desc: "감성적이고 섬세한 당신. 조용한 밤바다에서 가벼운 채비로 예민한 볼락을 꼬여내는 루어 낚시가 어울립니다. 아기자기한 손맛과 미적 감각을 만족시킵니다.",
+                tags: ["#볼락", "#밤낚시", "#섬세함", "#리트리브"],
+                image: "https://jaegyunkim.github.io/map-icons/rockfish.png",
+                bg: "bg-indigo-50"
+            },
+            "DOWNSHOT": {
+                name: "선상 다운샷 (Boat Downshot)",
+                subtitle: "확실한 결과와 효율성",
+                desc: "현실적이고 목표 지향적인 당신. 배 위에서 바닥을 읽으며 확실하게 광어를 낚아내는 다운샷이 딱입니다. 가장 효율적으로 조과를 보장받을 수 있는 낚시입니다.",
+                tags: ["#광어", "#선상낚시", "#바닥공략", "#냉장고채우기"],
+                image: "https://jaegyunkim.github.io/map-icons/boat.png",
+                bg: "bg-slate-100"
+            },
+            "TAIRUBBER": {
+                name: "선상 타이라바 (Tai Rubber)",
+                subtitle: "꾸준함이 만드는 기적",
+                desc: "안정적이고 조화로운 성격의 당신. 일정한 속도로 릴을 감으며 참돔을 유혹하는 타이라바는 인내심과 평정심이 강한 당신에게 최고의 조과를 선물할 것입니다.",
+                tags: ["#참돔", "#단순함의미학", "#릴링", "#바다의여왕"],
+                image: "https://jaegyunkim.github.io/map-icons/tai.png",
+                bg: "bg-pink-50"
+            },
+            "AJING": {
+                name: "방파제 아징 (Ajing)",
+                subtitle: "초경량의 짜릿한 손맛",
+                desc: "감각이 예민하고 자유로운 영혼. 아주 가벼운 장비로 전갱이의 미세한 입질을 느껴보는 아징은 당신의 섬세한 감각을 극대화해 줄 것입니다.",
+                tags: ["#전갱이", "#초경량", "#생활낚시", "#손맛"],
+                image: "https://jaegyunkim.github.io/map-icons/ajing.png",
+                bg: "bg-yellow-50"
+            },
+            "ROCKBOTTOM": {
+                name: "갯바위 돌돔 원투",
+                subtitle: "최강의 파워와 정복",
+                desc: "목표가 뚜렷하고 승부욕이 강한 당신. 바다의 제왕 돌돔을 상대로 거친 갯바위에서 힘대힘으로 맞붙는 이 낚시는 당신의 정복욕을 100% 충족시켜 줍니다.",
+                tags: ["#돌돔", "#전복미끼", "#한방", "#남자의낚시"],
+                image: "https://jaegyunkim.github.io/map-icons/rock.png",
+                bg: "bg-stone-200"
+            },
+            "BASS": {
+                name: "민물 배스 루어 (Bass Fishing)",
+                subtitle: "다양한 전략의 스포츠",
+                desc: "창의적이고 변화를 즐기는 당신. 수많은 종류의 루어로 상황에 맞춰 배스를 공략하는 이 낚시는 단순한 취미를 넘어 진정한 스포츠입니다.",
+                tags: ["#배스", "#스포츠피싱", "#액션", "#다양성"],
+                image: "https://jaegyunkim.github.io/map-icons/bass.png",
+                bg: "bg-green-50"
+            },
+            "CRUCIAN": {
+                name: "민물 붕어 낚시 (Crucian Carp)",
+                subtitle: "물멍과 사색의 시간",
+                desc: "내면의 평화를 사랑하는 당신. 고요한 물가에서 찌가 올라오길 기다리며 사색에 잠기는 붕어 낚시는 당신에게 진정한 휴식을 줄 것입니다.",
+                tags: ["#붕어", "#찌올림", "#떡밥", "#힐링"],
+                image: "https://jaegyunkim.github.io/map-icons/carp.png",
+                bg: "bg-teal-50"
+            },
+            "MANDARIN": {
+                name: "민물 쏘가리 루어",
+                subtitle: "흐르는 강물의 사냥꾼",
+                desc: "직관적이고 흐름을 잘 읽는 당신. 강한 여울 속에서 은신하는 쏘가리를 낚아내는 것은 높은 숙련도와 자연에 대한 이해를 가진 당신에게 어울리는 도전입니다.",
+                tags: ["#쏘가리", "#여울", "#웨이딩", "#최고급어종"],
+                image: "https://jaegyunkim.github.io/map-icons/mandarin.png",
+                bg: "bg-amber-50"
+            }
+        };
+
+        // --- LOGIC: MBTI Calculation & Mapping ---
+
+        let currentStep = 0;
+        let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+        const totalSteps = questions.length;
+
+        // Elements
+        const contentEl = document.getElementById('content');
+        const shareModal = document.getElementById('shareModal');
+
+        // Functions
+        function init() {
+            renderIntro();
+        }
+
+        function renderIntro() {
+            // Remove padding for full-screen image background
+            contentEl.className = "flex-1 flex flex-col relative overflow-hidden p-0";
+            
+            contentEl.innerHTML = `
+                <!-- Background Image -->
+                <div class="absolute inset-0 z-0">
+                    <img src="https://jaegyunkim.github.io/map-icons/catch_your_style.png" alt="Catch Your Style Background" class="w-full h-full object-cover">
+                    <!-- Overlay gradient for text readability if needed -->
+                    <div class="absolute inset-0 bg-black/10"></div>
+                </div>
+
+                <!-- Content Overlay -->
+                <!-- Changed to justify-end with pb-20 to position content in the lower-middle area (water section) -->
+                <div class="relative z-10 w-full h-full flex flex-col items-center justify-end pb-20 px-6">
+                    
+                    <!-- Start Button -->
+                    <button onclick="startQuiz()" class="w-full max-w-xs bg-sky-500 hover:bg-sky-600 text-white font-bold py-4 px-8 rounded-xl shadow-lg shadow-sky-900/20 transition-all btn-hover text-lg flex items-center justify-center gap-2 mb-6">
+                        낚시터로 출발하기 <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                    <!-- Information Text -->
+                    <div class="w-full max-w-xs text-center transform card-enter">
+                        <p class="text-slate-800 text-sm leading-relaxed mb-1 font-bold drop-shadow-sm">
+                            MBTI 성향 분석을 통해 당신에게<br>딱 맞는 낚시 장르를 추천해 드립니다.
+                        </p>
+                        <span class="text-xs text-slate-700 font-bold drop-shadow-sm">(총 ${totalSteps}문항, 약 1분 소요)</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startQuiz() {
+            currentStep = 0;
+            scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            // Restore default padding and layout for quiz
+            contentEl.className = "flex-1 flex flex-col items-center justify-center p-6 relative";
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentStep];
+            const progress = ((currentStep) / totalSteps) * 100;
+
+            contentEl.innerHTML = `
+                <div class="w-full card-enter">
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 mb-8">
+                        <div class="bg-sky-500 h-2.5 rounded-full transition-all duration-300 ease-out" style="width: ${progress}%"></div>
+                    </div>
+
+                    <!-- Question -->
+                    <div class="mb-10 text-center">
+                        <span class="inline-block px-3 py-1 bg-sky-100 text-sky-600 text-xs font-bold rounded-full mb-4">Q.${currentStep + 1}</span>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-800 leading-snug break-keep">${q.question}</h3>
+                    </div>
+
+                    <!-- Answers -->
+                    <div class="space-y-4">
+                        <button onclick="handleAnswer('${q.answers[0].value}')" class="w-full p-5 text-left bg-white border-2 border-slate-100 rounded-xl hover:border-sky-400 hover:bg-sky-50 transition-all duration-200 group shadow-sm">
+                            <span class="font-medium text-slate-700 group-hover:text-sky-700">${q.answers[0].text}</span>
+                        </button>
+                        <button onclick="handleAnswer('${q.answers[1].value}')" class="w-full p-5 text-left bg-white border-2 border-slate-100 rounded-xl hover:border-sky-400 hover:bg-sky-50 transition-all duration-200 group shadow-sm">
+                            <span class="font-medium text-slate-700 group-hover:text-sky-700">${q.answers[1].text}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.handleAnswer = function(value) {
+            scores[value]++;
+            currentStep++;
+
+            if (currentStep < totalSteps) {
+                renderQuestion();
+            } else {
+                showLoading();
+            }
+        };
+
+        function showLoading() {
+            contentEl.innerHTML = `
+                <div class="text-center">
+                    <div class="text-6xl text-sky-400 mb-4 loading-fish inline-block">
+                        <i class="fa-solid fa-fish"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-700 mb-2">낚시 스타일 분석 중...</h3>
+                    <p class="text-slate-500 text-sm">최적의 포인트를 찾고 있습니다.</p>
+                </div>
+            `;
+            setTimeout(calculateAndShowResult, 1500);
+        }
+
+        function calculateAndShowResult() {
+            const mbti = [
+                scores.E >= scores.I ? 'E' : 'I',
+                scores.S >= scores.N ? 'S' : 'N',
+                scores.T >= scores.F ? 'T' : 'F',
+                scores.J >= scores.P ? 'J' : 'P'
+            ].join('');
+
+            let resultKey = "SURF"; // Default
+
+            switch (mbti) {
+                case 'ESTP': resultKey = "SHORE"; break;
+                case 'ESFP': resultKey = "BASS"; break;
+                case 'ENFP': resultKey = "EGING"; break;
+                case 'ENTP': resultKey = "MANDARIN"; break;
+                case 'ESTJ': resultKey = "DOWNSHOT"; break;
+                case 'ENTJ': resultKey = "ROCKBOTTOM"; break;
+                case 'ENFJ': resultKey = "AJING"; break;
+                case 'ESFJ': resultKey = "TAIRUBBER"; break;
+                case 'ISTJ': resultKey = "SURF"; break;
+                case 'ISFJ': resultKey = "CRUCIAN"; break;
+                case 'ISTP': resultKey = "ROCKFISH"; break;
+                case 'ISFP': resultKey = "EGING"; break;
+                case 'INFJ': resultKey = "CRUCIAN"; break;
+                case 'INFP': resultKey = "AJING"; break;
+                case 'INTJ': resultKey = "FLOAT"; break;
+                case 'INTP': resultKey = "FLOAT"; break;
+            }
+
+            if (mbti === 'ISFP') resultKey = 'EGING';
+            if (mbti === 'INFP') resultKey = 'AJING';
+            if (mbti === 'INTJ') resultKey = 'TAIRUBBER';
+            if (mbti === 'ISTJ') resultKey = 'DOWNSHOT';
+            if (mbti === 'ISFJ') resultKey = 'SURF';
+
+            const result = fishingTypes[resultKey];
+
+            renderResult(mbti, result);
+        }
+
+        function renderResult(mbti, result) {
+            const tagsHtml = result.tags.map(tag => 
+                `<span class="px-3 py-1 bg-white bg-opacity-60 rounded-lg text-sm font-semibold shadow-sm text-slate-700">${tag}</span>`
+            ).join('');
+
+            contentEl.innerHTML = `
+                <div class="w-full card-enter pb-8">
+                    <div class="text-center mb-6">
+                        <span class="inline-block px-4 py-1 rounded-full bg-slate-100 text-slate-500 font-bold text-sm mb-2 tracking-wider">MBTI: ${mbti}</span>
+                        <h2 class="text-3xl font-black text-slate-800 wave-text leading-tight mb-1">${result.name}</h2>
+                        <p class="text-slate-500 font-medium">${result.subtitle}</p>
+                    </div>
+
+                    <div class="bg-gradient-to-br ${result.bg} from-white to-transparent p-6 rounded-2xl mb-6 shadow-inner border border-white relative overflow-hidden">
+                        <div class="text-center mb-4">
+                            <!-- Image Replacement -->
+                            <img src="${result.image}" alt="${result.name}" class="w-96 h-96 mx-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-300">
+                        </div>
+                        <p class="text-slate-700 leading-relaxed text-center break-keep">
+                            ${result.desc}
+                        </p>
+                        <div class="flex flex-wrap gap-2 justify-center mt-6">
+                            ${tagsHtml}
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="init()" class="flex-1 py-3 px-4 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-colors">
+                            <i class="fa-solid fa-rotate-right mr-2"></i>다시하기
+                        </button>
+                        <button onclick="openShareModal('${result.name}')" class="flex-1 py-3 px-4 bg-sky-500 text-white rounded-xl font-bold shadow-lg shadow-sky-200 btn-hover transition-colors">
+                            <i class="fa-solid fa-share-nodes mr-2"></i>결과 공유
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Share Functions ---
+        
+        function copyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Copy failed', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        window.openShareModal = function(resultName) {
+            const shareText = `[캐치 유어 스타일] 나의 낚시 성향은: ${resultName}\n#낚시MBTI #캐치유어스타일`;
+            
+            // 데이터 속성에 텍스트 저장
+            shareModal.dataset.shareText = shareText;
+            
+            shareModal.classList.remove('hidden');
+            shareModal.classList.add('flex');
+        }
+
+        window.closeShareModal = function() {
+            shareModal.classList.add('hidden');
+            shareModal.classList.remove('flex');
+        }
+
+        window.shareTo = function(platform) {
+            const text = shareModal.dataset.shareText;
+            const url = window.location.href; // 실제 배포 시 도메인 주소로 변경 가능
+
+            if (platform === 'x') {
+                // X (Twitter) Web Intent
+                const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+                window.open(twitterUrl, '_blank');
+            } 
+            else if (platform === 'facebook') {
+                // Facebook Sharer
+                const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+                window.open(fbUrl, '_blank');
+            } 
+            else if (platform === 'instagram') {
+                // Instagram은 웹에서 직접 공유 링크가 없으므로 텍스트 복사 후 인스타그램 홈으로 유도
+                copyToClipboard(text);
+                if(confirm("결과 텍스트가 복사되었습니다.\n인스타그램을 열어 붙여넣기 하시겠습니까?")) {
+                    window.open('https://instagram.com', '_blank');
+                }
+            } 
+            else if (platform === 'copy') {
+                copyToClipboard(text + " " + url);
+                alert("링크와 결과가 복사되었습니다!");
+            }
+        }
+
+        // Start the app
+        init();
+
+    </script>
+</body>
+</html>
