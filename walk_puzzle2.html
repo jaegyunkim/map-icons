@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>워킹 챌린지 퍼즐</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            touch-action: manipulation; /* 모바일에서 더블탭 줌 방지 */
+        }
+
+        .puzzle-board {
+            position: relative;
+            width: 100%;
+            max-width: 400px; /* 최대 크기 제한 */
+            aspect-ratio: 1 / 1;
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .tile {
+            position: absolute;
+            width: 33.333%;
+            height: 33.333%;
+            transition: top 0.2s ease-in-out, left 0.2s ease-in-out;
+            cursor: pointer;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-size: 300% 300%; /* 3x3 그리드이므로 300% */
+            z-index: 10;
+        }
+
+        .tile:hover {
+            filter: brightness(1.1);
+            z-index: 20;
+        }
+
+        /* 성공 시 오버레이 애니메이션 */
+        .fade-in {
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .btn {
+            transition: transform 0.1s;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* 메시지 애니메이션 */
+        .pulse-text {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- 게임 컨테이너 -->
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 flex flex-col items-center space-y-4">
+        
+        <!-- 헤더 -->
+        <div class="text-center w-full">
+            <div class="flex justify-between items-center mb-2">
+                <span id="stage-badge" class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded border border-blue-400">
+                    STAGE <span id="current-stage-num">1</span>
+                </span>
+                <div class="flex items-center gap-2">
+                    <button onclick="solveGame()" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-xs font-bold px-2 py-1 rounded border border-yellow-300 transition-colors">
+                        힌트
+                    </button>
+                    <button onclick="toggleHelp()" class="text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800 mb-1">퍼즐을 완성하세요</h1>
+            <p class="text-xs text-gray-500">빈 칸 주변의 타일을 클릭하여 이동시키세요.</p>
+        </div>
+
+        <!-- 퍼즐 영역 -->
+        <div id="game-container" class="puzzle-board border-4 border-gray-800 relative">
+            <!-- 타일들이 JS로 생성됨 -->
+            <div id="tiles-wrapper" class="w-full h-full relative"></div>
+            <!-- 오버레이 삭제됨 (모든 완료 메시지는 하단 영역 사용) -->
+        </div>
+
+        <!-- 하단 영역: 원본 이미지 미리보기 및 상태 메시지/컨트롤 -->
+        <div class="w-full flex justify-center mt-4 min-h-[7rem] items-center"> <!-- 높이 유연하게 변경 -->
+            <div class="text-center w-full" id="preview-area">
+                
+                <!-- 1. 기본: 이미지 모드 -->
+                <div id="preview-content">
+                    <p class="text-xs text-gray-400 mb-1">목표 이미지</p>
+                    <img id="preview-img" src="" alt="Preview" class="w-24 h-24 object-cover rounded border border-gray-300 shadow-sm opacity-80 mx-auto">
+                </div>
+
+                <!-- 2. 1~5단계 완료: 카운트다운 메시지 -->
+                <div id="stage-msg" class="hidden flex flex-col items-center justify-center h-full">
+                    <p class="text-xl font-bold text-blue-600 mb-2">완성! 🎉</p>
+                    <p class="text-gray-600 font-medium pulse-text">
+                        <span id="countdown-timer" class="text-2xl font-bold text-blue-500">5</span>초 후에<br>다음 단계로 이동합니다
+                    </p>
+                </div>
+
+                <!-- 3. 6단계 완료: 최종 컨트롤 버튼 -->
+                <div id="final-msg" class="hidden flex flex-col items-center justify-center w-full py-2">
+                    <p class="text-lg font-bold text-indigo-600 mb-3">모든 챌린지 성공! 🏆</p>
+                    <div class="flex flex-col sm:flex-row gap-2 w-full justify-center px-2">
+                        <button onclick="resetGame()" class="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold py-2 px-3 rounded-lg shadow transition-colors">
+                            처음부터 다시하기
+                        </button>
+                        <button onclick="goToMoreInfo()" class="flex-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-bold py-2 px-3 rounded-lg shadow border border-yellow-500 transition-colors">
+                            더 많은 정보보기
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 도움말 모달 -->
+    <div id="help-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4" onclick="toggleHelp()">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full" onclick="event.stopPropagation()">
+            <h3 class="text-lg font-bold mb-2">게임 방법</h3>
+            <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                <li>총 6단계의 스테이지가 있습니다.</li>
+                <li>빈 칸(회색) 옆의 타일을 클릭하면 이동합니다.</li>
+                <li>그림을 원래대로 맞추면 다음 단계로 넘어갈 수 있습니다.</li>
+            </ul>
+            <button onclick="toggleHelp()" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 py-2 rounded text-sm font-bold text-gray-700">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        // 게임 설정 데이터
+        const stages = [
+            "https://jaegyunkim.github.io/map-icons/walk_1.png",
+            "https://jaegyunkim.github.io/map-icons/walk_2.png",
+            "https://jaegyunkim.github.io/map-icons/walk_3.png",
+            "https://jaegyunkim.github.io/map-icons/walk_4.png",
+            "https://jaegyunkim.github.io/map-icons/walk_5.png",
+            "https://jaegyunkim.github.io/map-icons/walk_main.png"
+        ];
+
+        let currentStageIndex = 0;
+        const gridSize = 3; // 3x3
+        let tiles = []; // 현재 타일 상태 배열
+        let emptyPos = { row: 2, col: 2 }; // 빈 칸의 위치
+        let isSolved = false;
+        let autoMoveTimer = null; // 자동 이동 타이머
+        let countdownInterval = null; // 카운트다운 인터벌
+
+        // DOM 요소
+        const tilesWrapper = document.getElementById('tiles-wrapper');
+        const stageNumDisplay = document.getElementById('current-stage-num');
+        const previewImg = document.getElementById('preview-img');
+        
+        // 하단 영역 요소
+        const previewContent = document.getElementById('preview-content');
+        const stageMsg = document.getElementById('stage-msg');
+        const finalMsg = document.getElementById('final-msg');
+        const countdownTimer = document.getElementById('countdown-timer');
+
+        // 게임 초기화
+        function initGame() {
+            // 타이머 정리
+            if (autoMoveTimer) clearTimeout(autoMoveTimer);
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            isSolved = false;
+            
+            // 하단 영역 초기화 (이미지 보이기, 메시지 숨기기)
+            previewContent.classList.remove('hidden');
+            stageMsg.classList.add('hidden');
+            finalMsg.classList.add('hidden');
+
+            stageNumDisplay.textContent = currentStageIndex + 1;
+            previewImg.src = stages[currentStageIndex];
+            
+            // 타일 생성 및 초기화 (정답 상태)
+            tiles = [];
+            tilesWrapper.innerHTML = '';
+            
+            const tileSize = 100 / gridSize; // 퍼센트 단위 크기
+
+            for (let row = 0; row < gridSize; row++) {
+                for (let col = 0; col < gridSize; col++) {
+                    // 마지막 칸은 빈 칸으로 설정
+                    if (row === gridSize - 1 && col === gridSize - 1) {
+                        emptyPos = { row, col };
+                        continue;
+                    }
+
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    
+                    // 배경 이미지 설정
+                    tile.style.backgroundImage = `url('${stages[currentStageIndex]}')`;
+                    
+                    // 배경 위치 계산
+                    const bgX = col * (100 / (gridSize - 1));
+                    const bgY = row * (100 / (gridSize - 1));
+                    tile.style.backgroundPosition = `${bgX}% ${bgY}%`;
+                    
+                    // 타일의 현재 위치 (초기에는 정답 위치)
+                    tile.style.top = `${row * tileSize}%`;
+                    tile.style.left = `${col * tileSize}%`;
+                    
+                    // 데이터 저장
+                    tile.dataset.row = row;
+                    tile.dataset.col = col;
+                    tile.dataset.correctRow = row; // 정답 위치 확인용
+                    tile.dataset.correctCol = col;
+                    
+                    // 클릭 이벤트
+                    tile.onclick = () => moveTile(tile);
+
+                    tilesWrapper.appendChild(tile);
+                    tiles.push(tile);
+                }
+            }
+
+            // 셔플 (무작위로 섞되, 풀 수 있는 상태 유지)
+            shuffleTiles();
+        }
+
+        // 타일 섞기
+        function shuffleTiles() {
+            const moves = 100;
+            let lastMovedTile = null;
+
+            for (let i = 0; i < moves; i++) {
+                const neighbors = getMovableNeighbors();
+                const candidates = neighbors.filter(t => t !== lastMovedTile);
+                
+                const tileToMove = candidates.length > 0 
+                    ? candidates[Math.floor(Math.random() * candidates.length)] 
+                    : neighbors[Math.floor(Math.random() * neighbors.length)];
+
+                if (tileToMove) {
+                    swapTilePosition(tileToMove, false);
+                    lastMovedTile = tileToMove;
+                }
+            }
+        }
+
+        // 이동 가능한 타일 찾기
+        function getMovableNeighbors() {
+            return tiles.filter(tile => {
+                const r = parseInt(tile.dataset.row);
+                const c = parseInt(tile.dataset.col);
+                const distance = Math.abs(r - emptyPos.row) + Math.abs(c - emptyPos.col);
+                return distance === 1; // 상하좌우 인접한 타일
+            });
+        }
+
+        // 타일 이동 로직
+        function moveTile(tile) {
+            if (isSolved) return;
+
+            const r = parseInt(tile.dataset.row);
+            const c = parseInt(tile.dataset.col);
+
+            // 빈 칸과 인접한지 확인 (상하좌우 거리 합이 1이어야 함)
+            if (Math.abs(r - emptyPos.row) + Math.abs(c - emptyPos.col) === 1) {
+                swapTilePosition(tile, true);
+            }
+        }
+
+        // 위치 교환 수행
+        function swapTilePosition(tile, checkWinCondition = true) {
+            const currentR = parseInt(tile.dataset.row);
+            const currentC = parseInt(tile.dataset.col);
+            
+            // 빈 칸 좌표 임시 저장
+            const newR = emptyPos.row;
+            const newC = emptyPos.col;
+            
+            const tileSize = 100 / gridSize;
+
+            // DOM 및 데이터 업데이트
+            tile.style.top = `${newR * tileSize}%`;
+            tile.style.left = `${newC * tileSize}%`;
+            tile.dataset.row = newR;
+            tile.dataset.col = newC;
+
+            // 빈 칸 좌표 갱신
+            emptyPos.row = currentR;
+            emptyPos.col = currentC;
+
+            if (checkWinCondition) {
+                checkWin();
+            }
+        }
+
+        // 승리 조건 확인
+        function checkWin() {
+            let correctCount = 0;
+            
+            tiles.forEach(tile => {
+                const r = parseInt(tile.dataset.row);
+                const c = parseInt(tile.dataset.col);
+                const cr = parseInt(tile.dataset.correctRow);
+                const cc = parseInt(tile.dataset.correctCol);
+
+                if (r === cr && c === cc) {
+                    correctCount++;
+                }
+            });
+
+            // 모든 타일이 제자리에 있으면 성공
+            if (correctCount === (gridSize * gridSize) - 1) {
+                isSolved = true;
+                showSuccessScreen();
+            }
+        }
+
+        // 성공 화면 표시
+        function showSuccessScreen() {
+            
+            // [공통] 빈 칸 채우기 (완성된 이미지 보여주기)
+            if (!document.getElementById('completed-piece')) {
+                const tileSize = 100 / gridSize;
+                const completedTile = document.createElement('div');
+                completedTile.id = 'completed-piece';
+                completedTile.className = 'tile';
+                completedTile.style.backgroundImage = `url('${stages[currentStageIndex]}')`;
+                completedTile.style.backgroundPosition = '100% 100%'; // 마지막 칸 (우측 하단)
+                completedTile.style.top = `${(gridSize - 1) * tileSize}%`;
+                completedTile.style.left = `${(gridSize - 1) * tileSize}%`;
+                completedTile.style.cursor = 'default';
+                completedTile.style.opacity = '0'; // 페이드인 시작값
+                completedTile.style.transition = 'opacity 0.5s ease-in-out';
+                completedTile.style.zIndex = '5';
+                
+                tilesWrapper.appendChild(completedTile);
+                
+                // 애니메이션 실행
+                setTimeout(() => {
+                    completedTile.style.opacity = '1';
+                }, 50);
+            }
+
+            // 하단 미리보기 영역 숨김
+            previewContent.classList.add('hidden');
+
+            if (currentStageIndex < stages.length - 1) {
+                // [1~5 단계] 카운트다운 메시지 표시
+                stageMsg.classList.remove('hidden');
+
+                // 5초 카운트다운 시작
+                let timeLeft = 5;
+                countdownTimer.textContent = timeLeft;
+                
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    if(timeLeft > 0) {
+                        countdownTimer.textContent = timeLeft;
+                    } else {
+                        clearInterval(countdownInterval);
+                    }
+                }, 1000);
+
+                // 5초 후 다음 단계
+                autoMoveTimer = setTimeout(() => {
+                    nextStage();
+                }, 5000);
+                
+            } else {
+                // [6단계 (마지막)] 최종 버튼 표시
+                finalMsg.classList.remove('hidden');
+            }
+        }
+
+        // 다음 단계
+        function nextStage() {
+            if (currentStageIndex < stages.length - 1) {
+                currentStageIndex++;
+                initGame();
+            }
+        }
+
+        // 다시 하기 (1단계로)
+        function resetGame() {
+            currentStageIndex = 0;
+            initGame();
+        }
+
+        // 더 많은 정보 보기
+        function goToMoreInfo() {
+            window.open('https://m.blog.naver.com/thedailypick', '_blank');
+        }
+        
+        // 도움말 토글
+        function toggleHelp() {
+            const modal = document.getElementById('help-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        // 힌트 기능 (퍼즐 자동 완성)
+        function solveGame() {
+            if (isSolved) return;
+
+            tiles.forEach(tile => {
+                const correctR = parseInt(tile.dataset.correctRow);
+                const correctC = parseInt(tile.dataset.correctCol);
+                const tileSize = 100 / gridSize;
+                
+                // 데이터 업데이트
+                tile.dataset.row = correctR;
+                tile.dataset.col = correctC;
+                
+                // 시각적 위치 업데이트
+                tile.style.top = `${correctR * tileSize}%`;
+                tile.style.left = `${correctC * tileSize}%`;
+            });
+
+            // 빈 칸 위치를 마지막(2,2)으로 재설정
+            emptyPos = { row: gridSize - 1, col: gridSize - 1 };
+
+            // 승리 체크 (즉시 완료 처리)
+            checkWin();
+        }
+
+        // 앱 시작
+        window.onload = initGame;
+
+    </script>
+</body>
+</html>
